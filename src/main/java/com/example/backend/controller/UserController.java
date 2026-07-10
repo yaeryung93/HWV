@@ -4,6 +4,7 @@ import com.example.backend.dto.RegisterRequest;
 import com.example.backend.entity.User;
 import com.example.backend.service.UserService;
 import org.springframework.web.bind.annotation.*;
+import com.example.backend.dto.LoginRequest;
 
 @RestController
 @RequestMapping("/users")
@@ -27,4 +28,12 @@ public class UserController {
 
         return "회원가입 성공!";
     }
+    @PostMapping("/login")
+    public String login(@RequestBody LoginRequest request){
+
+        userService.login(request.getEmail(), request.getPassword());
+
+        return "로그인 성공!";
+    }
 }
+

@@ -14,6 +14,22 @@ public class UserService {
     }
 
     public User register(User user) {
+
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("이미 가입된 이메일입니다.");
+        }
+
         return userRepository.save(user);
+    }
+    public User login(String email, String password) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 이메일입니다."));
+
+        if (!user.getPassword().equals(password)) {
+            throw new RuntimeException("비밀번호가 틀렸습니다.");
+        }
+
+        return user;
     }
 }
