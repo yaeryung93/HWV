@@ -37,7 +37,7 @@ function Header({ simple = false }) {
             도움말
           </button>
 
-          <Button variant="outline" onClick={() => alert("회원가입 준비 중")}>
+          <Button variant="outline" onClick={() => navigate("/signup")}>
             회원가입
           </Button>
         </div>
@@ -79,7 +79,7 @@ function Header({ simple = false }) {
               type="button"
               onClick={handleLogout}
             >
-              <span className="header__avatar">성</span>
+              <span className="header__avatar">이름</span>
               <span className="header__user-name">사용자</span>
             </button>
           </div>

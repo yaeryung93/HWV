@@ -1,3 +1,4 @@
+import { loginUser } from "../../services/authApi";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
@@ -24,8 +25,10 @@ function LoginForm() {
     }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+
+    console.log("로그인 버튼 클릭됨");
 
     if (formData.email.trim() === "") {
       setErrorMessage("이메일을 입력해 주세요.");
@@ -39,10 +42,16 @@ function LoginForm() {
 
     setErrorMessage("");
 
-    console.log("로그인 데이터:", formData);
+    try {
+      const result = await loginUser(formData.email, formData.password);
 
-    // Spring Boot 로그인 API가 완성되면 이 부분을 API 요청으로 변경한다.
-    navigate("/home");
+      console.log("로그인 성공", result);
+
+      navigate("/home");
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
+    }
   }
 
   function handleGoogleLogin() {
@@ -88,9 +97,7 @@ function LoginForm() {
           />
         </div>
 
-        {errorMessage && (
-          <p className="login-form__error">{errorMessage}</p>
-        )}
+        {errorMessage && <p className="login-form__error">{errorMessage}</p>}
 
         <div className="login-form__options">
           <label className="login-form__remember">
@@ -127,7 +134,7 @@ function LoginForm() {
 
       <p className="login-form__signup">
         아직 계정이 없으신가요?
-        <a href="#signup"> 회원가입</a>
+        <Link to="/signup"> 회원가입</Link>
       </p>
     </section>
   );

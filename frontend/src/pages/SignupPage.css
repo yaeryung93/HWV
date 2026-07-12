@@ -1,0 +1,113 @@
+.signup-page {
+  min-height: 100vh;
+  background-color: var(--color-background);
+}
+
+.signup-page__main {
+  display: grid;
+  grid-template-columns: minmax(320px, 500px) minmax(350px, 430px);
+  align-items: center;
+  justify-content: center;
+  gap: 80px;
+
+  min-height: calc(100vh - var(--header-height));
+  padding: 50px 30px;
+}
+
+.signup-page__eyebrow {
+  margin-bottom: 12px;
+  color: var(--color-primary);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.signup-page__introduction h1 {
+  font-size: clamp(38px, 5vw, 58px);
+  line-height: 1.25;
+}
+
+.signup-page__introduction h1 span {
+  color: var(--color-primary);
+}
+
+.signup-page__description {
+  max-width: 500px;
+  margin-top: 22px;
+
+  color: var(--color-text-light);
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.signup-page__features {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  margin-top: 32px;
+}
+
+.signup-page__features > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.signup-page__features span {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+.signup-page__features p {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  color: var(--color-text-light);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.signup-page__features strong {
+  color: var(--color-text);
+  font-size: 15px;
+}
+
+@media (max-width: 950px) {
+  .signup-page__main {
+    grid-template-columns: 1fr;
+    gap: 45px;
+  }
+
+  .signup-page__introduction {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .signup-page__features {
+    max-width: 480px;
+    margin-right: auto;
+    margin-left: auto;
+    text-align: left;
+  }
+
+  .signup-form {
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 500px) {
+  .signup-page__main {
+    padding: 32px 18px;
+  }
+}
