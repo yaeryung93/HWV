@@ -14,14 +14,34 @@ function UploadPage() {
     }
   }
 
-  function handleUpload() {
+  async function handleUpload() {
     if (!selectedFile) {
       alert("먼저 파일을 선택해 주세요.");
       return;
     }
 
-    console.log("업로드할 파일:", selectedFile);
-    alert(`${selectedFile.name} 파일이 선택되었습니다.`);
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      const response = await fetch(
+          "https://sumquiz.onrender.com/pdf/summary",
+          {
+            method: "POST",
+            body: formData,
+          }
+      );
+
+      const summary = await response.text();
+
+      console.log(summary);
+
+      alert(summary);
+
+    } catch (e) {
+      console.error(e);
+      alert("업로드 실패");
+    }
   }
 
   return (
