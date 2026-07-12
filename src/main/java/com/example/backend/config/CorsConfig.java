@@ -14,8 +14,12 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://relaxed-alpaca-73fcc7.netlify.app")
-                        .allowedMethods("*")
+                        .allowedOrigins(
+                                "http://localhost:5173",
+                                "https://relaxed-alpaca-73fcc7.netlify.app",
+                                "https://fabulous-pothos-d4a9b4.netlify.app"
+                        )
+                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                         .allowedHeaders("*");
             }
         };
