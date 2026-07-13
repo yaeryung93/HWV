@@ -55,7 +55,7 @@ function LoginForm() {
   }
 
   function handleGoogleLogin() {
-    alert("Google 로그인은 나중에 백엔드와 연결합니다.");
+    alert("공사중");
   }
 
   return (

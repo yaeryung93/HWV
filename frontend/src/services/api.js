@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = "https://sumquiz.onrender.com";
 
 export async function requestApi(endpoint, options = {}) {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -9,9 +9,25 @@ export async function requestApi(endpoint, options = {}) {
     },
   });
 
-  if (!response.ok) {
-    throw new Error("로그인 실패");
+  const contentType = response.headers.get("content-type") || "";
+
+  let result;
+
+  if (contentType.includes("application/json")) {
+    result = await response.json();
+  } else {
+    result = await response.text();
   }
 
-  return response.json();
+  if (!response.ok) {
+    const message =
+      result?.message ||
+      result?.error ||
+      result ||
+      `요청에 실패했습니다. (${response.status})`;
+
+    throw new Error(message);
+  }
+
+  return result;
 }
