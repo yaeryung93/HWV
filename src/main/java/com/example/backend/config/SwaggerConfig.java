@@ -12,8 +12,8 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("SumQuiz API")
+                        .title("HWV API")
                         .version("1.0")
-                        .description("PDF 요약 및 AI 퀴즈 생성 서비스 API"));
+                        .description("코딩 학습에 도움을 주는 서비스 API"));
     }
 }

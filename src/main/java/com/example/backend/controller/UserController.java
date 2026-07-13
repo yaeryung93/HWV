@@ -30,11 +30,18 @@ public class UserController {
         return Map.of("message", "회원가입 성공!");
     }
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody LoginRequest request){
+    public Map<String, Object> login(@RequestBody LoginRequest request) {
 
-        userService.login(request.getEmail(), request.getPassword());
+        User user = userService.login(
+                request.getEmail(),
+                request.getPassword()
+        );
 
-        return Map.of("message", "로그인 성공!");
+        return Map.of(
+                "message", "로그인 성공!",
+                "userId", user.getId(),
+                "name", user.getName()
+        );
     }
 }
 
