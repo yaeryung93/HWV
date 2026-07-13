@@ -1,4 +1,4 @@
-# SumQuiz Code Lab 프런트엔드 구조
+# HWV Code Lab 프런트엔드 구조
 
 ## 목표 흐름
 

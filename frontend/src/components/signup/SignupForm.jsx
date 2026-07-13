@@ -89,7 +89,7 @@ function SignupForm() {
         <h2>회원가입</h2>
 
         <p>
-          <strong>SumQuiz</strong>와 함께 새로운 학습을 시작하세요.
+          <strong>HWV</strong>와 함께 코딩 학습을 시작하세요.
         </p>
       </div>
 

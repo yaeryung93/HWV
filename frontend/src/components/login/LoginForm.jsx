@@ -67,7 +67,7 @@ function LoginForm() {
         <h2>로그인</h2>
 
         <p>
-          <strong>SumQuiz</strong>에 오신 것을 환영합니다!
+          <strong>HWV</strong>에 오신 것을 환영합니다!
         </p>
       </div>
 

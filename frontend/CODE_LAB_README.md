@@ -1,4 +1,4 @@
-# SumQuiz Code Lab
+# HWV Code Lab
 
 기존 로그인·회원가입 화면을 유지하면서 프로젝트 코드 기반 AI 문제 생성과
 코드 풀이 화면을 추가한 React 프런트엔드 프로토타입입니다.
