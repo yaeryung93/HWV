@@ -19,7 +19,8 @@ public class CorsConfig { //s
                                 "https://sum-quiz-flax.vercel.app",
                                 "https://relaxed-alpaca-73fcc7.netlify.app",
                                 "https://fabulous-pothos-d4a9b4.netlify.app",
-                                "https://sum-quiz-liart.vercel.app"
+                                "https://sum-quiz-liart.vercel.app",
+                                "https://sum-quiz-on7wevlye-yaeryung.vercel.app"
                         )
                         .allowedMethods(
                                 "GET",
