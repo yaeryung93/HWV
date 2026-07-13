@@ -10,7 +10,7 @@ function LoginPage() {
 
       <main className="login-page__main">
         <section className="login-page__introduction">
-          <p className="login-page__welcome">Welcome to</p>
+          <b className="login-page__welcome">Help With Vision</b>
 
           <h1 className="login-page__title">
             Sum<span>Quiz</span>

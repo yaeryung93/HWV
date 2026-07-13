@@ -27,7 +27,7 @@ function Header({ simple = false }) {
         <span className="header__logo-icon">♧</span>
 
         <span>
-          Sum<span className="header__logo-green">Quiz</span>
+          Help <span className="header__logo-green">With Vision</span>
         </span>
       </Link>
 
