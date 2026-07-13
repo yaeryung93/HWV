@@ -56,9 +56,7 @@ function AppLayout() {
           onClick={() => navigate("/dashboard")}
         >
           <span className="lab-brand__mark">♣</span>
-          <span>
-            Sum<strong>Quiz</strong>
-          </span>
+          <strong>HWV</strong>
         </button>
 
         <div className="lab-header__actions">

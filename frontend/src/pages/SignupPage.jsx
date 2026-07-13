@@ -10,17 +10,17 @@ function SignupPage() {
 
       <main className="signup-page__main">
         <section className="signup-page__introduction">
-          <p className="signup-page__eyebrow">Start with SumQuiz</p>
+          <p className="signup-page__eyebrow">Start coding with HWV</p>
 
           <h1>
-            학습 자료 하나로
+            학습 자료에서 시작하는
             <br />
-            <span>더 똑똑하게 공부하세요.</span>
+            <span>나만의 AI 코딩 연습</span>
           </h1>
 
           <p className="signup-page__description">
-            PDF와 뉴스 기사 링크를 등록하면 AI가 핵심 내용을 요약하고, 나만의
-            퀴즈와 플래시카드를 만들어드립니다.
+            소스코드, 프로젝트 폴더 또는 PDF를 업로드하면 AI가 사용 언어와
+            내용을 분석해 난이도별 코딩 문제를 만들어드립니다.
           </p>
 
           <div className="signup-page__features">
@@ -28,8 +28,8 @@ function SignupPage() {
               <span>1</span>
 
               <p>
-                <strong>PDF·링크 업로드</strong>
-                학습할 자료를 간편하게 등록하세요.
+                <strong>파일·폴더·PDF 업로드</strong>
+                공부할 코드와 자료를 한 번에 등록하세요.
               </p>
             </div>
 
@@ -37,8 +37,8 @@ function SignupPage() {
               <span>2</span>
 
               <p>
-                <strong>AI 요약·퀴즈 생성</strong>
-                핵심 요약과 맞춤형 문제를 받아보세요.
+                <strong>AI 코딩 문제 생성</strong>
+                언어와 난이도에 맞는 문제를 받아보세요.
               </p>
             </div>
 
@@ -46,8 +46,8 @@ function SignupPage() {
               <span>3</span>
 
               <p>
-                <strong>오답 복습과 학습 리포트</strong>
-                나의 학습 기록과 부족한 부분을 확인하세요.
+                <strong>코드 실행·맞춤 피드백</strong>
+                테스트 결과와 AI 힌트로 부족한 점을 보완하세요.
               </p>
             </div>
           </div>

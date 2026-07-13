@@ -26,9 +26,7 @@ function Header({ simple = false }) {
       <Link className="header__logo" to={simple ? "/login" : "/home"}>
         <span className="header__logo-icon">♧</span>
 
-        <span>
-          Sum<span className="header__logo-green">Quiz</span>
-        </span>
+        <span className="header__logo-green">HWV</span>
       </Link>
 
       {simple ? (
@@ -53,11 +51,11 @@ function Header({ simple = false }) {
             </NavLink>
 
             <NavLink className={getNavigationClass} to="/summary">
-              AI 요약
+              AI 문제
             </NavLink>
 
             <NavLink className={getNavigationClass} to="/quiz">
-              퀴즈
+              코딩 연습
             </NavLink>
 
             <NavLink className={getNavigationClass} to="/report">

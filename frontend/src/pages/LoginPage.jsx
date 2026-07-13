@@ -13,13 +13,12 @@ function LoginPage() {
           <p className="login-page__welcome">Welcome to</p>
 
           <h1 className="login-page__title">
-            Sum<span>Quiz</span>
+            <span>HWV</span>
           </h1>
 
           <p className="login-page__description">
-            AI가 요약하고, 퀴즈로 학습해주는
-            <br />
-            당신만의 똑똑한 학습 파트너
+            AI가 학습 자료를 코딩 문제로 바꾸고<br />
+            테스트와 힌트로 성장을 돕는 학습 파트너
           </p>
 
           <div className="login-page__illustration">

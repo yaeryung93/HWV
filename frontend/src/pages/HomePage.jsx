@@ -49,7 +49,7 @@ function HomePage() {
       </main>
 
       <footer className="home-page__footer">
-        © 2026 SumQuiz. AI 학습 도우미
+        © 2026 HWV. AI 코딩 학습 도우미
       </footer>
     </div>
   );
