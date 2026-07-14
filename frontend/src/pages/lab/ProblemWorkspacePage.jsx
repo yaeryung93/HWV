@@ -25,7 +25,12 @@ function ProblemWorkspacePage() {
         if (active && result) {
           setProblem(result);
           setSourceCode(result.starterCode);
-          setLanguage(result.language || "javascript");
+          setLanguage(
+            result.detectedLanguage ||
+              result.programmingLanguage ||
+              result.language ||
+              "언어 정보 없음",
+          );
           setTests(result.tests);
         }
       })
@@ -107,10 +112,6 @@ function ProblemWorkspacePage() {
                   {problem.difficulty}
                 </span>
               </div>
-              <div>
-                <button type="button">♡ 북마크</button>
-                <button type="button">문제 정보</button>
-              </div>
             </div>
 
             {problem.summary && (
@@ -143,7 +144,6 @@ function ProblemWorkspacePage() {
             value={sourceCode}
             language={language}
             onChange={setSourceCode}
-            onLanguageChange={setLanguage}
           />
 
           <div className="workspace-actions">

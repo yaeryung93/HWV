@@ -648,15 +648,6 @@
   font-size: 24px;
 }
 
-.problem-statement__header button {
-  min-height: 36px;
-  padding: 0 12px;
-  color: #606760;
-  background: #ffffff;
-  border: 1px solid #dce2dc;
-  border-radius: 7px;
-}
-
 .problem-statement > p,
 .problem-statement li {
   color: #5d645d;
@@ -706,12 +697,25 @@
   font-size: 16px;
 }
 
-.code-card__header select {
-  min-width: 100px;
-  height: 36px;
-  padding: 0 10px;
-  border: 1px solid #dce2dc;
-  border-radius: 7px;
+.code-card__language {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 12px;
+  color: #35763d;
+  background: #eef8ed;
+  border: 1px solid #b9dbb9;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.code-card__language span {
+  color: #6b816d;
+}
+
+.code-card__language strong {
+  font-size: 13px;
 }
 
 .code-editor {
