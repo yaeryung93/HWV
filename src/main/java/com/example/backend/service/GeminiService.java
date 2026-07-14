@@ -139,4 +139,14 @@ public class GeminiService {
     public List<Quiz> generateQuiz(String summary) {
         return new ArrayList<>();
     }
+
+    public String summarize(String text) {
+
+        String prompt = """
+        다음 내용을 핵심만 한국어로 요약해줘.
+
+        """ + text;
+
+        return callGemini(prompt);
+    }
 }
