@@ -7,7 +7,7 @@ import "./AppLayout.css";
 
 const navigationItems = [
   { to: "/dashboard", label: "대시보드", icon: "⌂" },
-  { to: "/problems", label: "AI 문제", icon: "▣" },
+  { to: "/quiz", label: "Java 퀴즈", icon: "▣" },
   { to: "/wrong-notes", label: "오답노트", icon: "▤" },
   { to: "/statistics", label: "학습 통계", icon: "▥" },
   { to: "/profile", label: "마이페이지", icon: "○" },
@@ -88,7 +88,7 @@ function AppLayout() {
           onClick={() => navigate("/problems/new")}
         >
           <span>＋</span>
-          새 문제 만들기
+          새 퀴즈 만들기
         </button>
 
         <nav className="lab-sidebar__navigation">

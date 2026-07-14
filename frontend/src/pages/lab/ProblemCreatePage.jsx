@@ -1,74 +1,74 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { createProblemsFromProject } from "../../services/problemApi";
 import {
-  ACCEPTED_FILE_TYPES,
-  detectUploadedMaterial,
-  filterSupportedFiles,
-} from "../../utils/fileDetection";
+  analyzeJavaFile,
+  createJavaQuiz,
+} from "../../services/javaLearningApi";
 import "./LabPages.css";
 
 function ProblemCreatePage() {
-  const folderInputRef = useRef(null);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
-  const [files, setFiles] = useState([]);
-  const [language, setLanguage] = useState("감지 전");
-  const [materialInfo, setMaterialInfo] = useState(null);
-  const [difficulty, setDifficulty] = useState("보통");
-  const [count, setCount] = useState(3);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [analysis, setAnalysis] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  function addFiles(fileList) {
-    const nextFiles = filterSupportedFiles(fileList);
+  function selectJavaFile(fileList) {
+    const file = Array.from(fileList).find((item) =>
+      item.name.toLowerCase().endsWith(".java"),
+    );
 
-    if (nextFiles.length === 0) {
-      setFiles([]);
-      setMaterialInfo(null);
-      setLanguage("감지되지 않음");
-      setErrorMessage(
-        "지원하는 소스 코드 또는 PDF 파일을 찾지 못했습니다.",
-      );
+    if (!file) {
+      setSelectedFile(null);
+      setAnalysis(null);
+      setErrorMessage("확장자가 .java인 Java 파일만 업로드할 수 있습니다.");
       return;
     }
 
-    const nextMaterialInfo = detectUploadedMaterial(nextFiles);
-
-    setFiles(nextFiles);
-    setMaterialInfo(nextMaterialInfo);
-    setLanguage(nextMaterialInfo.language);
+    setSelectedFile(file);
+    setAnalysis(null);
     setErrorMessage("");
   }
 
   function handleFileChange(event) {
-    addFiles(event.target.files);
+    selectJavaFile(event.target.files);
     event.target.value = "";
   }
 
-  async function handleSubmit(event) {
+  async function handleAnalyze(event) {
     event.preventDefault();
 
-    if (files.length === 0) {
-      setErrorMessage("분석할 파일 또는 폴더를 먼저 선택해 주세요.");
+    if (!selectedFile) {
+      setErrorMessage("분석할 Java 파일을 먼저 선택해 주세요.");
+      return;
+    }
+
+    try {
+      setIsAnalyzing(true);
+      setErrorMessage("");
+      setAnalysis(await analyzeJavaFile(selectedFile));
+    } catch (error) {
+      setErrorMessage(error.message || "Java 파일을 분석하지 못했습니다.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  }
+
+  async function handleCreateQuiz() {
+    if (!analysis) {
+      setErrorMessage("Java 파일 분석을 먼저 완료해 주세요.");
       return;
     }
 
     try {
       setIsCreating(true);
       setErrorMessage("");
-
-      const problems = await createProblemsFromProject({
-        files,
-        language,
-        difficulty,
-        count,
-        materialType: materialInfo?.materialType,
-      });
-
-      navigate("/problems/" + problems[0].id);
+      await createJavaQuiz(analysis);
+      navigate("/quiz");
     } catch (error) {
       setErrorMessage(error.message || "문제를 생성하지 못했습니다.");
     } finally {
@@ -80,25 +80,22 @@ function ProblemCreatePage() {
     <div className="lab-page lab-page--narrow">
       <div className="lab-page__heading">
         <div>
-          <span className="lab-page__eyebrow">AI PROBLEM MAKER</span>
-          <h1>AI 문제 만들기</h1>
+          <span className="lab-page__eyebrow">JAVA AI LEARNING</span>
+          <h1>Java 파일 분석</h1>
           <p>
-            코드나 PDF를 업로드하면 AI가 내용을 요약하고 선택한 난이도에 맞는
-            문제를 만듭니다.
+            Java 파일을 업로드하면 AI가 핵심 문법 3개를 분석하고 맞춤 문제
+            5개를 만듭니다.
           </p>
         </div>
       </div>
 
-      <form className="creation-card" onSubmit={handleSubmit}>
+      <form className="creation-card" onSubmit={handleAnalyze}>
         <section>
           <div className="section-heading">
             <span>1</span>
             <div>
-              <h2>학습자료 업로드</h2>
-              <p>
-                소스 파일, PDF 또는 프로젝트 폴더를 선택하면 자료 유형과
-                프로그래밍 언어를 확인합니다.
-              </p>
+              <h2>Java 파일 업로드</h2>
+              <p>분석할 .java 파일 하나를 선택해 주세요.</p>
             </div>
           </div>
 
@@ -107,26 +104,17 @@ function ProblemCreatePage() {
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
               event.preventDefault();
-              addFiles(event.dataTransfer.files);
+              selectJavaFile(event.dataTransfer.files);
             }}
           >
-            <strong>파일을 끌어다 놓거나 아래 버튼으로 선택하세요.</strong>
-            <span>
-              PDF, Java, Kotlin, Python, JavaScript, TypeScript, React, C/C++ 등
-              지원
-            </span>
+            <strong>Java 파일을 끌어다 놓거나 아래 버튼으로 선택하세요.</strong>
+            <span>.java 파일만 업로드할 수 있습니다.</span>
             <div>
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
               >
-                파일 선택
-              </button>
-              <button
-                type="button"
-                onClick={() => folderInputRef.current?.click()}
-              >
-                폴더 선택
+                Java 파일 선택
               </button>
             </div>
           </div>
@@ -134,133 +122,88 @@ function ProblemCreatePage() {
           <input
             ref={fileInputRef}
             type="file"
-            multiple
-            accept={ACCEPTED_FILE_TYPES}
-            onChange={handleFileChange}
-            hidden
-          />
-          <input
-            ref={folderInputRef}
-            type="file"
-            multiple
-            webkitdirectory=""
+            accept=".java"
             onChange={handleFileChange}
             hidden
           />
 
-          {files.length > 0 && (
+          {selectedFile && (
             <div className="selected-project">
               <div>
-                <strong>파일 선택 완료 · {files.length}개</strong>
+                <strong>파일 선택 완료</strong>
                 <span className="selected-project__language">
-                  감지된 언어 <b>{language}</b>
+                  분석 언어 <b>Java</b>
                 </span>
-                <span>
-                  {files
-                    .slice(0, 4)
-                    .map((file) => file.webkitRelativePath || file.name)
-                    .join(" · ")}
-                </span>
+                <span>{selectedFile.name}</span>
                 <small>
-                  {materialInfo?.codeFileCount
-                    ? `소스 코드 ${materialInfo.codeFileCount}개`
-                    : ""}
-                  {materialInfo?.codeFileCount && materialInfo?.pdfCount
-                    ? " · "
-                    : ""}
-                  {materialInfo?.pdfCount
-                    ? `PDF ${materialInfo.pdfCount}개`
-                    : ""}
-                  {" · AI 문제 만들기를 누르면 업로드됩니다."}
+                  {(selectedFile.size / 1024).toFixed(1)}KB · AI 분석을 시작할 수
+                  있습니다.
                 </small>
               </div>
               <button
                 type="button"
                 onClick={() => {
-                  setFiles([]);
-                  setMaterialInfo(null);
-                  setLanguage("감지 전");
+                  setSelectedFile(null);
+                  setAnalysis(null);
+                  setErrorMessage("");
                 }}
               >
                 초기화
               </button>
             </div>
           )}
+
+          <button
+            type="submit"
+            className="creation-analyze-button"
+            disabled={isAnalyzing || !selectedFile}
+          >
+            {isAnalyzing ? "AI가 Java 코드를 분석하고 있습니다..." : "AI 분석 시작"}
+          </button>
         </section>
 
-        <section>
-          <div className="section-heading">
-            <span>2</span>
-            <div>
-              <h2>문제 생성 설정</h2>
-              <p>감지된 언어를 확인하고 원하는 난이도를 선택하세요.</p>
-            </div>
-          </div>
-
-          <div className="creation-fields">
-            <label>
-              언어 감지 결과
-              <output className="detected-language">{language}</output>
-            </label>
-
-            <fieldset className="difficulty-field">
-              <legend>난이도</legend>
-              <div className="difficulty-options">
-                {["쉬움", "보통", "어려움"].map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    className={
-                      difficulty === option
-                        ? "difficulty-option difficulty-option--active"
-                        : "difficulty-option"
-                    }
-                    onClick={() => setDifficulty(option)}
-                  >
-                    {option}
-                  </button>
-                ))}
+        {analysis && (
+          <section className="analysis-result-section">
+            <div className="section-heading">
+              <span>2</span>
+              <div>
+                <h2>AI 분석 결과</h2>
+                <p>업로드한 코드에서 찾은 핵심 Java 문법입니다.</p>
               </div>
-            </fieldset>
+            </div>
 
-            <label>
-              문제 수
-              <select
-                value={count}
-                onChange={(event) => setCount(Number(event.target.value))}
-              >
-                <option value={1}>1개</option>
-                <option value={3}>3개</option>
-                <option value={5}>5개</option>
-              </select>
-            </label>
-          </div>
+            <div className="grammar-card-grid">
+              {analysis.grammars.map((grammar) => (
+                <article className="grammar-card" key={grammar.name}>
+                  <strong>{grammar.name}</strong>
+                  <span
+                    className="grammar-card__rating"
+                    aria-label={`중요도 5점 중 ${grammar.rating}점`}
+                  >
+                    {"★".repeat(grammar.rating)}
+                    <i>{"★".repeat(5 - grammar.rating)}</i>
+                  </span>
+                  <p>{grammar.description}</p>
+                </article>
+              ))}
+            </div>
 
-          <div className="ai-generation-note">
-            <strong>AI 생성 방식</strong>
-            <p>
-              소스 코드는 확장자로 언어를 즉시 감지합니다. PDF는 서버에서 내용을
-              추출한 뒤 AI가 언어와 핵심 내용을 분석하며, 선택한 난이도를 기준으로
-              문제와 테스트 케이스를 만듭니다.
-            </p>
-          </div>
-        </section>
+            <button
+              type="button"
+              className="creation-submit"
+              disabled={isCreating}
+              onClick={handleCreateQuiz}
+            >
+              {isCreating ? "AI가 문제 5개를 만들고 있습니다..." : "문제 5개 생성하기"}
+            </button>
+          </section>
+        )}
 
         {errorMessage && (
           <p className="form-error" role="alert">
             {errorMessage}
           </p>
         )}
-
-        <button
-          type="submit"
-          className="creation-submit"
-          disabled={isCreating}
-        >
-          {isCreating
-            ? "파일을 업로드하고 AI가 문제를 만들고 있습니다..."
-            : "업로드 및 AI 문제 만들기"}
-        </button>
       </form>
     </div>
   );

@@ -1,3 +1,6 @@
+import { getLocalJavaQuizStatistics } from "./javaLearningApi";
+import { getUserId } from "./session";
+
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API !== "false";
@@ -285,7 +288,7 @@ export async function submitSolution({ problemId, language, sourceCode }) {
 
 export async function getDashboardSummary() {
   if (!USE_MOCK_API) {
-    return request("/api/me/dashboard");
+    return request(`/api/me/dashboard?userId=${getUserId()}`);
   }
 
   await wait(180);
@@ -302,19 +305,29 @@ export async function getDashboardSummary() {
     (sum, attempt) => sum + attempt.passedCount,
     0,
   );
+  const javaQuizStatistics = getLocalJavaQuizStatistics();
+  const javaAnswerTotal =
+    javaQuizStatistics.correctAnswers + javaQuizStatistics.incorrectAnswers;
 
   return {
-    generatedProblems: problems.length,
+    generatedProblems:
+      problems.length + javaQuizStatistics.generatedProblems,
     attempts: attempts.length,
     solvedProblems: solvedProblemIds.size,
-    accuracy: totalTests ? Math.round((passedTests / totalTests) * 100) : 0,
+    correctAnswers: javaQuizStatistics.correctAnswers,
+    incorrectAnswers: javaQuizStatistics.incorrectAnswers,
+    accuracy: javaAnswerTotal
+      ? Math.round((javaQuizStatistics.correctAnswers / javaAnswerTotal) * 100)
+      : totalTests
+        ? Math.round((passedTests / totalTests) * 100)
+        : 0,
     recentAttempts: attempts.slice(0, 4),
   };
 }
 
 export async function getWrongNotes() {
   if (!USE_MOCK_API) {
-    return request("/api/me/wrong-notes");
+    return request(`/api/me/wrong-notes?userId=${getUserId()}`);
   }
 
   await wait(180);
@@ -323,7 +336,7 @@ export async function getWrongNotes() {
 
 export async function getLearningStatistics() {
   if (!USE_MOCK_API) {
-    return request("/api/me/statistics");
+    return request(`/api/me/statistics?userId=${getUserId()}`);
   }
 
   const summary = await getDashboardSummary();

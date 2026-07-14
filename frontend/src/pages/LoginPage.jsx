@@ -17,8 +17,8 @@ function LoginPage() {
           </h1>
 
           <p className="login-page__description">
-            AI가 학습 자료를 코딩 문제로 바꾸고<br />
-            테스트와 힌트로 성장을 돕는 학습 파트너
+            AI가 Java 코드의 핵심 문법을 분석하고<br />
+            맞춤 퀴즈로 성장을 돕는 학습 파트너
           </p>
 
           <div className="login-page__illustration">

@@ -29,9 +29,9 @@ function DashboardPage() {
       value: summary?.generatedProblems ?? 0,
       unit: "개",
     },
-    { label: "코드 제출", value: summary?.attempts ?? 0, unit: "회" },
-    { label: "해결한 문제", value: summary?.solvedProblems ?? 0, unit: "개" },
-    { label: "테스트 정답률", value: summary?.accuracy ?? 0, unit: "%" },
+    { label: "정답", value: summary?.correctAnswers ?? 0, unit: "개" },
+    { label: "오답", value: summary?.incorrectAnswers ?? 0, unit: "개" },
+    { label: "퀴즈 정답률", value: summary?.accuracy ?? 0, unit: "%" },
   ];
 
   return (
@@ -43,8 +43,8 @@ function DashboardPage() {
             안녕하세요{user?.name ? `, ${user.name}님` : ""}
           </h1>
           <p>
-            코드나 PDF를 업로드하면 AI가 내용을 요약하고 맞춤 문제를 만들어
-            줍니다.
+            Java 파일을 업로드하면 AI가 핵심 문법을 분석하고 맞춤 퀴즈를
+            만들어 줍니다.
           </p>
         </div>
 
@@ -107,19 +107,19 @@ function DashboardPage() {
           <ol>
             <li>
               <b>1</b>
-              <span>소스 코드, PDF 또는 프로젝트 폴더 업로드</span>
+              <span>학습할 Java 파일 업로드</span>
             </li>
             <li>
               <b>2</b>
-              <span>AI가 언어를 감지하고 학습자료 내용을 요약</span>
+              <span>AI가 핵심 Java 문법 3개 분석</span>
             </li>
             <li>
               <b>3</b>
-              <span>선택한 난이도에 맞춰 문제와 테스트 생성</span>
+              <span>분석 결과를 바탕으로 퀴즈 5개 생성</span>
             </li>
             <li>
               <b>4</b>
-              <span>문제를 풀고 힌트와 보완점 확인</span>
+              <span>퀴즈를 풀고 정답과 오답 확인</span>
             </li>
           </ol>
         </section>

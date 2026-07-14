@@ -20,6 +20,13 @@ function StatisticsPage() {
     };
   }, []);
 
+  const correctAnswers = statistics?.correctAnswers ?? 0;
+  const incorrectAnswers = statistics?.incorrectAnswers ?? 0;
+  const answerCount = correctAnswers + incorrectAnswers;
+  const accuracy =
+    statistics?.accuracy ??
+    (answerCount ? Math.round((correctAnswers / answerCount) * 100) : 0);
+
   return (
     <div className="lab-page">
       <div className="lab-page__heading">
@@ -30,21 +37,42 @@ function StatisticsPage() {
         </div>
       </div>
 
+      <section className="metric-grid statistics-metrics">
+        <article className="metric-card">
+          <span>생성된 문제</span>
+          <strong>
+            {statistics?.generatedProblems ?? 0}<small>개</small>
+          </strong>
+        </article>
+        <article className="metric-card">
+          <span>정답</span>
+          <strong>
+            {correctAnswers}<small>개</small>
+          </strong>
+        </article>
+        <article className="metric-card">
+          <span>오답</span>
+          <strong>
+            {incorrectAnswers}<small>개</small>
+          </strong>
+        </article>
+      </section>
+
       <div className="statistics-grid">
         <section className="surface-card accuracy-card">
           <h2>전체 테스트 정답률</h2>
           <div
             className="accuracy-ring"
             style={{
-              "--accuracy": (statistics?.accuracy || 0) * 3.6 + "deg",
+              "--accuracy": accuracy * 3.6 + "deg",
             }}
           >
             <div>
-              <strong>{statistics?.accuracy ?? 0}%</strong>
+              <strong>{accuracy}%</strong>
               <span>정답률</span>
             </div>
           </div>
-          <p>제출 {statistics?.attempts ?? 0}회 기준</p>
+          <p>퀴즈 응답 {answerCount}개 기준</p>
         </section>
 
         <section className="surface-card category-chart">
@@ -63,7 +91,7 @@ function StatisticsPage() {
             </div>
           ) : (
             <div className="compact-empty">
-              문제를 풀면 언어별 정답률이 표시됩니다.
+              문제를 풀면 문법별 정답률이 표시됩니다.
             </div>
           )}
         </section>
