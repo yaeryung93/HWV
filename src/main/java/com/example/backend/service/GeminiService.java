@@ -14,11 +14,10 @@ import java.util.*;
 public class GeminiService {
     @Value("${gemini.api.key}") private String apiKey;
     private final WebClient webClient = WebClient.builder().baseUrl("https://generativelanguage.googleapis.com").build();
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final JavaSyntaxDetector syntaxDetector;
 
-    public GeminiService(ObjectMapper objectMapper, JavaSyntaxDetector syntaxDetector) {
-        this.objectMapper = objectMapper;
+    public GeminiService(JavaSyntaxDetector syntaxDetector) {
         this.syntaxDetector = syntaxDetector;
     }
 
