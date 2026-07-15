@@ -58,7 +58,7 @@ ChatGPT, Gemini, Claude
 #### 하단 명시
 
 ##### 사용한 AI 모델
-Claude, ChatGPT, Gemini 등
+Claude, ChatGPT, Gemini, Codex
 
 ---
 
