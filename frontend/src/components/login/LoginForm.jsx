@@ -16,6 +16,7 @@ function LoginForm() {
   });
 
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   function handleInputChange(event) {
     const { name, value, type, checked } = event.target;
@@ -28,6 +29,10 @@ function LoginForm() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if (isLoggingIn) {
+      return;
+    }
 
     console.log("로그인 버튼 클릭됨");
 
@@ -42,6 +47,7 @@ function LoginForm() {
     }
 
     setErrorMessage("");
+    setIsLoggingIn(true);
 
     try {
       const result = await loginUser(formData.email, formData.password);
@@ -54,6 +60,8 @@ function LoginForm() {
     } catch (error) {
       console.error(error);
       setErrorMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
+    } finally {
+      setIsLoggingIn(false);
     }
   }
 
@@ -71,7 +79,7 @@ function LoginForm() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} aria-busy={isLoggingIn}>
         <div className="login-form__field">
           <label htmlFor="email">이메일</label>
 
@@ -83,6 +91,7 @@ function LoginForm() {
             placeholder="이메일을 입력하세요"
             autoComplete="email"
             onChange={handleInputChange}
+            disabled={isLoggingIn}
           />
         </div>
 
@@ -97,6 +106,7 @@ function LoginForm() {
             placeholder="비밀번호를 입력하세요"
             autoComplete="current-password"
             onChange={handleInputChange}
+            disabled={isLoggingIn}
           />
         </div>
 
@@ -109,6 +119,7 @@ function LoginForm() {
               type="checkbox"
               checked={formData.rememberLogin}
               onChange={handleInputChange}
+              disabled={isLoggingIn}
             />
 
             <span>로그인 상태 유지</span>
@@ -117,8 +128,8 @@ function LoginForm() {
           <Link to="/find-password">비밀번호 찾기</Link>
         </div>
 
-        <Button type="submit" fullWidth>
-          로그인
+        <Button type="submit" fullWidth disabled={isLoggingIn}>
+          {isLoggingIn ? "로그인 중..." : "로그인"}
         </Button>
       </form>
 
