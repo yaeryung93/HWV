@@ -5,20 +5,26 @@ import "./LabPages.css";
 
 function StatisticsPage() {
   const [statistics, setStatistics] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let active = true;
+    setIsLoading(true);
+    setErrorMessage("");
 
     getLearningStatistics().then((result) => {
       if (active) {
         setStatistics(result);
       }
-    });
+    }).catch((error) => { if (active) setErrorMessage(error.message); })
+      .finally(() => { if (active) setIsLoading(false); });
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [reloadKey]);
 
   const correctAnswers = statistics?.correctAnswers ?? 0;
   const incorrectAnswers = statistics?.incorrectAnswers ?? 0;
@@ -26,6 +32,19 @@ function StatisticsPage() {
   const accuracy =
     statistics?.accuracy ??
     (answerCount ? Math.round((correctAnswers / answerCount) * 100) : 0);
+
+  if (isLoading) {
+    return <div className="lab-page"><section className="large-empty">학습 통계를 불러오고 있습니다.</section></div>;
+  }
+
+  if (errorMessage && !statistics) {
+    return (
+      <div className="lab-page"><section className="large-empty">
+        <strong>학습 통계를 불러오지 못했습니다.</strong><span>{errorMessage}</span>
+        <button type="button" className="lab-primary-link" onClick={() => setReloadKey((value) => value + 1)}>다시 불러오기</button>
+      </section></div>
+    );
+  }
 
   return (
     <div className="lab-page">

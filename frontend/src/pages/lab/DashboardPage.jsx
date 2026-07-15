@@ -8,21 +8,26 @@ import "./LabPages.css";
 function DashboardPage() {
   const [summary, setSummary] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [reloadKey, setReloadKey] = useState(0);
   const user = getSessionUser();
 
   useEffect(() => {
     let active = true;
+    setIsLoading(true);
+    setErrorMessage("");
 
     getDashboardSummary().then((result) => {
       if (active) {
         setSummary(result);
       }
-    }).catch((error) => { if (active) setErrorMessage(error.message); });
+    }).catch((error) => { if (active) setErrorMessage(error.message); })
+      .finally(() => { if (active) setIsLoading(false); });
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [reloadKey]);
 
   const cards = [
     {
@@ -34,6 +39,19 @@ function DashboardPage() {
     { label: "보완 필요", value: summary?.incorrectAnswers ?? 0, unit: "개" },
     { label: "AI 예상 통과율", value: summary?.accuracy ?? 0, unit: "%" },
   ];
+
+  if (isLoading) {
+    return <div className="lab-page"><section className="large-empty">학습 현황을 불러오고 있습니다.</section></div>;
+  }
+
+  if (errorMessage && !summary) {
+    return (
+      <div className="lab-page"><section className="large-empty">
+        <strong>학습 현황을 불러오지 못했습니다.</strong><span>{errorMessage}</span>
+        <button type="button" className="lab-primary-link" onClick={() => setReloadKey((value) => value + 1)}>다시 불러오기</button>
+      </section></div>
+    );
+  }
 
   return (
     <div className="lab-page">

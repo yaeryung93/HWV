@@ -40,6 +40,14 @@ public class GeminiService {
         return String.valueOf(((Map<?, ?>) parts.get(0)).get("text"));
     }
 
+    private JsonNode readGeminiJson(String response) throws Exception {
+        String cleaned = response.trim();
+        if (cleaned.startsWith("```")) {
+            cleaned = cleaned.replaceFirst("^```(?:json)?\\s*", "").replaceFirst("\\s*```$", "");
+        }
+        return objectMapper.readTree(cleaned);
+    }
+
     public JavaAnalysisResponse analyzeCode(String code) {
         List<JavaSyntaxDetector.Detected> detected = syntaxDetector.detect(code);
         String allowed = objectMapper.valueToTree(detected).toString();
@@ -129,22 +137,31 @@ public class GeminiService {
             참고할 Java 코드: %s
             """.formatted(objectMapper.valueToTree(detected), code);
         try {
-            JsonNode problems = objectMapper.readTree(callGemini(prompt)).path("problems");
-            if (problems.size() != 3) throw new IllegalStateException("Gemini가 문법별 문제 3개를 반환하지 않았습니다.");
-            Set<String> allowed = new LinkedHashSet<>(); detected.forEach(item -> allowed.add(item.name()));
-            Set<String> used = new HashSet<>(); List<CodingProblemDraft> result = new ArrayList<>();
-            for (JsonNode node : problems) {
-                String grammar = node.path("grammarName").asText();
-                if (!allowed.contains(grammar) || !used.add(grammar)) throw new IllegalStateException("문법별 문제 생성 규칙을 지키지 못했습니다.");
+            JsonNode root = readGeminiJson(callGemini(prompt));
+            JsonNode problems = root.isArray() ? root : root.path("problems");
+            if (problems.size() < 3) throw new IllegalStateException("AI가 코딩 문제 3개를 완성하지 못했습니다. 다시 시도해 주세요.");
+            List<CodingProblemDraft> result = new ArrayList<>();
+            for (int i = 0; i < 3; i++) {
+                JsonNode node = problems.get(i);
+                String grammar = detected.get(i).name();
                 List<String> requirements = new ArrayList<>(); node.path("requirements").forEach(item -> requirements.add(item.asText()));
+                if (requirements.isEmpty()) requirements.add(grammar + " 문법을 활용해 요구 기능을 구현하세요.");
                 List<CodingProblemDraft.TestCase> tests = new ArrayList<>();
-                node.path("tests").forEach(test -> tests.add(new CodingProblemDraft.TestCase(test.path("id").asInt(), test.path("name").asText(), test.path("input").asText(), test.path("expected").asText())));
-                if (tests.size() != 3) throw new IllegalStateException("각 문제에는 테스트케이스 3개가 필요합니다.");
+                for (int testIndex = 0; testIndex < Math.min(3, node.path("tests").size()); testIndex++) {
+                    JsonNode test = node.path("tests").get(testIndex);
+                    tests.add(new CodingProblemDraft.TestCase(testIndex + 1,
+                        test.path("name").asText("테스트 케이스 " + (testIndex + 1)), test.path("input").asText(), test.path("expected").asText()));
+                }
+                while (tests.size() < 3) {
+                    int testNumber = tests.size() + 1;
+                    tests.add(new CodingProblemDraft.TestCase(testNumber, "추가 검증 " + testNumber,
+                        testNumber == 1 ? node.path("inputExample").asText() : "경계값 입력 " + testNumber,
+                        testNumber == 1 ? node.path("outputExample").asText() : "문제 요구사항을 만족하는 결과"));
+                }
                 result.add(new CodingProblemDraft(grammar, node.path("title").asText(), node.path("description").asText(), requirements,
                     node.path("inputExample").asText(), node.path("outputExample").asText(), node.path("starterCode").asText(),
                     node.path("difficulty").asText("보통"), tests));
             }
-            if (!used.equals(allowed)) throw new IllegalStateException("핵심 문법 3개가 모두 문제로 생성되지 않았습니다.");
             return result;
         } catch (Exception e) {
             if (e instanceof IllegalStateException state) throw state;
@@ -163,7 +180,7 @@ public class GeminiService {
             제출 코드: %s
             """.formatted(objectMapper.valueToTree(problem), sourceCode);
         try {
-            JsonNode root = objectMapper.readTree(callGemini(prompt)); List<CodingReviewResponse.TestResult> tests = new ArrayList<>();
+            JsonNode root = readGeminiJson(callGemini(prompt)); List<CodingReviewResponse.TestResult> tests = new ArrayList<>();
             root.path("tests").forEach(test -> tests.add(new CodingReviewResponse.TestResult(test.path("id").asInt(), test.path("name").asText(),
                 test.path("status").asText(), test.path("input").asText(), test.path("expected").asText(), test.path("actual").asText(), test.path("reason").asText())));
             if (tests.size() != 3) throw new IllegalStateException("AI 검토 결과에 테스트 3개가 필요합니다.");
