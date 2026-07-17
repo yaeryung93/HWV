@@ -35,6 +35,7 @@
 | Backend | Spring Boot(Java), MySQL(DB), Render|
 | Frontend | HTML, JavaScript, CSS, React, Netlify |
 | Design | Figma |
+| IDE / Tool | VScode, InteliJ, Codex, ChatGPT, Claude |
 
 ---
 
