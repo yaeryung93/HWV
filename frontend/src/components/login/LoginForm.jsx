@@ -16,6 +16,7 @@ function LoginForm() {
   });
 
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleInputChange(event) {
     const { name, value, type, checked } = event.target;
@@ -28,6 +29,10 @@ function LoginForm() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
 
     console.log("로그인 버튼 클릭됨");
 
@@ -42,6 +47,7 @@ function LoginForm() {
     }
 
     setErrorMessage("");
+    setIsSubmitting(true);
 
     try {
       const result = await loginUser(formData.email, formData.password);
@@ -54,6 +60,8 @@ function LoginForm() {
     } catch (error) {
       console.error(error);
       setErrorMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -117,8 +125,8 @@ function LoginForm() {
           <Link to="/find-password">비밀번호 찾기</Link>
         </div>
 
-        <Button type="submit" fullWidth>
-          로그인
+        <Button type="submit" fullWidth disabled={isSubmitting}>
+          {isSubmitting ? "로그인 중..." : "로그인"}
         </Button>
       </form>
 
