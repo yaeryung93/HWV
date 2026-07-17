@@ -45,7 +45,16 @@ public class GeminiService {
         if (cleaned.startsWith("```")) {
             cleaned = cleaned.replaceFirst("^```(?:json)?\\s*", "").replaceFirst("\\s*```$", "");
         }
-        return objectMapper.readTree(cleaned);
+        int objectStart = cleaned.indexOf('{');
+        int arrayStart = cleaned.indexOf('[');
+        int start = objectStart < 0 ? arrayStart : arrayStart < 0 ? objectStart : Math.min(objectStart, arrayStart);
+        if (start < 0) throw new IllegalStateException("Gemini 응답에서 JSON을 찾을 수 없습니다.");
+
+        char opening = cleaned.charAt(start);
+        char closing = opening == '{' ? '}' : ']';
+        int end = cleaned.lastIndexOf(closing);
+        if (end < start) throw new IllegalStateException("Gemini JSON 응답이 완전하지 않습니다.");
+        return objectMapper.readTree(cleaned.substring(start, end + 1));
     }
 
     public JavaAnalysisResponse analyzeCode(String code) {
@@ -61,7 +70,7 @@ public class GeminiService {
             %s
             """.formatted(allowed, code);
         try {
-            JsonNode root = objectMapper.readTree(callGemini(prompt));
+            JsonNode root = readGeminiJson(callGemini(prompt));
             List<JavaAnalysisResponse.Grammar> grammars = new ArrayList<>();
             JsonNode nodes = root.path("grammars");
             for (int i = 0; i < detected.size(); i++) {
@@ -93,7 +102,7 @@ public class GeminiService {
             %s
             """.formatted(objectMapper.valueToTree(detected), code);
         try {
-            JsonNode quizzes = objectMapper.readTree(callGemini(prompt)).path("quizzes");
+            JsonNode quizzes = readGeminiJson(callGemini(prompt)).path("quizzes");
             if (quizzes.size() != 5) throw new IllegalStateException("Gemini가 문제 5개를 반환하지 않았습니다.");
             List<Quiz> result = new ArrayList<>();
             for (JsonNode node : quizzes) {
@@ -123,6 +132,9 @@ public class GeminiService {
 
     public List<CodingProblemDraft> generateCodingProblems(String code) {
         List<JavaSyntaxDetector.Detected> detected = syntaxDetector.detect(code);
+        if (detected.size() < 3) {
+            throw new IllegalArgumentException("업로드한 코드에서 코딩 문제를 만들 핵심 Java 문법 3개를 찾지 못했습니다.");
+        }
         String prompt = """
             아래 Java 코드에서 서버가 검증한 핵심 문법 3개 각각에 대해 프로그래머스 형식의 코딩 문제를 정확히 1개씩 생성하라.
             따라서 문제는 정확히 3개이며, 각 grammarName은 탐지 목록의 이름을 한 번씩 그대로 사용한다.

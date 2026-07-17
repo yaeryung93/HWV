@@ -59,7 +59,9 @@ function LoginForm() {
       navigate("/home");
     } catch (error) {
       console.error(error);
-      setErrorMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
+      setErrorMessage(
+        error.message || "로그인 중 오류가 발생했습니다. 다시 시도해 주세요.",
+      );
     } finally {
       setIsLoggingIn(false);
     }
