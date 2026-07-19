@@ -146,6 +146,8 @@ public class GeminiService {
             객관식, Java 일반 상식, 개념 설명, 원본 코드나 변수명을 맞히는 문제는 절대 만들지 않는다.
             각 문제는 사용자가 Java 메서드를 직접 구현하는 코딩 테스트여야 하며, 해당 문법을 실제로 활용해야 해결할 수 있어야 한다.
             title, description, requirements, inputExample, outputExample, starterCode를 구체적으로 작성한다.
+            title은 80자 이내, description은 1,000자 이내로 핵심만 설명하고 같은 내용을 반복하지 않는다.
+            requirements의 각 항목은 300자 이내로 작성하며 문제당 최대 5개만 만든다.
             starterCode에는 컴파일 가능한 class Solution과 구현할 메서드 선언을 포함하되 정답 구현은 넣지 않는다.
             각 문제에는 기본값, 경계값, 일반값을 포함한 서로 다른 테스트케이스를 정확히 3개 만든다.
             모든 테스트케이스의 name, input, expected를 비워 두지 말고 입력과 정확한 기대 출력을 명시한다.

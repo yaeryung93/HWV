@@ -10,12 +10,12 @@ public class CodingProblem {
     @ManyToOne(fetch = FetchType.LAZY, optional = false) @JsonIgnore private User user;
     @Column(nullable = false, length = 100) private String grammarName;
     @Column(nullable = false) private String title;
-    @Lob @Column(nullable = false) private String description;
-    @Lob private String requirementsJson;
-    @Lob private String inputExample;
-    @Lob private String outputExample;
-    @Lob private String starterCode;
-    @Lob @Column(nullable = false) private String testsJson;
+    @Lob @Column(nullable = false, columnDefinition = "LONGTEXT") private String description;
+    @Lob @Column(columnDefinition = "LONGTEXT") private String requirementsJson;
+    @Lob @Column(columnDefinition = "LONGTEXT") private String inputExample;
+    @Lob @Column(columnDefinition = "LONGTEXT") private String outputExample;
+    @Lob @Column(columnDefinition = "LONGTEXT") private String starterCode;
+    @Lob @Column(nullable = false, columnDefinition = "LONGTEXT") private String testsJson;
     @Column(nullable = false) private String difficulty = "보통";
     @Column(nullable = false) private LocalDateTime createdAt = LocalDateTime.now();
 
