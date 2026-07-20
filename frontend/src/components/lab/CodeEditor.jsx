@@ -22,24 +22,42 @@ function CodeEditor({ value, onChange, language }) {
     event.preventDefault();
 
     const textarea = event.currentTarget;
+    const source = textarea.value;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    const indentation = "    ";
+    const tabSize = 4;
+    const lineStart = source.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
 
     if (start === end && !event.shiftKey) {
-      onChange(value.slice(0, start) + indentation + value.slice(end));
-      restoreSelection(start + indentation.length, start + indentation.length);
+      const column = start - lineStart;
+      const spaces = tabSize - (column % tabSize);
+      const indentation = " ".repeat(spaces);
+      onChange(source.slice(0, start) + indentation + source.slice(end));
+      restoreSelection(start + spaces, start + spaces);
       return;
     }
 
-    const blockStart = value.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
-    const nextNewLine = value.indexOf("\n", end);
-    const blockEnd = nextNewLine === -1 ? value.length : nextNewLine;
-    const lines = value.slice(blockStart, blockEnd).split("\n");
+    if (start === end && event.shiftKey) {
+      const leadingSpaces = source.slice(lineStart).match(/^ {1,4}/)?.[0].length || 0;
+      if (!leadingSpaces) return;
+
+      onChange(source.slice(0, lineStart) + source.slice(lineStart + leadingSpaces));
+      const nextCursor = Math.max(lineStart, start - leadingSpaces);
+      restoreSelection(nextCursor, nextCursor);
+      return;
+    }
+
+    const blockStart = lineStart;
+    const effectiveEnd = end > start && source[end - 1] === "\n" ? end - 1 : end;
+    const nextNewLine = source.indexOf("\n", effectiveEnd);
+    const blockEnd = nextNewLine === -1 ? source.length : nextNewLine;
+    const lines = source.slice(blockStart, blockEnd).split("\n");
     const firstLineOffset = start - blockStart;
 
     if (event.shiftKey) {
-      const removedCounts = lines.map((line) => line.match(/^ {1,4}/)?.[0].length || 0);
+      const removedCounts = lines.map(
+        (line) => line.match(/^ {1,4}/)?.[0].length || 0,
+      );
       const transformed = lines
         .map((line, index) => line.slice(removedCounts[index]))
         .join("\n");
@@ -47,15 +65,20 @@ function CodeEditor({ value, onChange, language }) {
       const newStart = start - Math.min(removedCounts[0], firstLineOffset);
       const newEnd = Math.max(newStart, end - totalRemoved);
 
-      onChange(value.slice(0, blockStart) + transformed + value.slice(blockEnd));
+      onChange(
+        source.slice(0, blockStart) + transformed + source.slice(blockEnd),
+      );
       restoreSelection(newStart, newEnd);
       return;
     }
 
+    const indentation = " ".repeat(tabSize);
     const transformed = lines.map((line) => indentation + line).join("\n");
     const addedLength = indentation.length * lines.length;
 
-    onChange(value.slice(0, blockStart) + transformed + value.slice(blockEnd));
+    onChange(
+      source.slice(0, blockStart) + transformed + source.slice(blockEnd),
+    );
     restoreSelection(start + indentation.length, end + addedLength);
   }
 

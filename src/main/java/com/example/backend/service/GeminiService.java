@@ -70,7 +70,7 @@ public class GeminiService {
 
             1. summary: 코드의 목적과 흐름을 500자 이내로 요약한다.
             2. grammars: 탐지 목록 순서대로 정확히 3개를 설명한다. name과 evidence는 탐지 목록 값을 그대로 사용한다.
-            3. quizzes: 실제 코드 표현을 근거로 하는 객관식 문제를 정확히 5개 만든다. answer는 1부터 5까지다.
+            3. quizzes: 탐지 목록 순서대로 문법마다 실제 코드 표현을 근거로 하는 객관식 문제를 하나씩, 정확히 3개 만든다. answer는 1부터 5까지다.
             4. codingProblems: 탐지 목록 순서대로 문법마다 프로그래머스 형식의 Java 코딩 문제를 하나씩, 정확히 3개 만든다.
             객관식이 아닌 구현 문제이며 title은 80자, description은 1,000자 이내로 작성한다.
             각 코딩 문제에는 서로 다른 테스트를 정확히 3개 넣고 input과 expected를 짧은 문자열로 작성한다.
@@ -102,7 +102,7 @@ public class GeminiService {
                 root.path("summary").asText("업로드한 Java 코드를 분석했습니다."), grammars, code);
 
             JsonNode quizzes = root.path("quizzes");
-            if (quizzes.size() != 5) throw new IllegalStateException("Gemini가 문제 5개를 반환하지 않았습니다.");
+            if (quizzes.size() != 3) throw new IllegalStateException("Gemini가 객관식 문제 3개를 반환하지 않았습니다.");
             List<Quiz> quizResult = new ArrayList<>();
             Set<String> allowedGrammarNames = new LinkedHashSet<>();
             selected.forEach(item -> allowedGrammarNames.add(item.name()));
@@ -110,7 +110,7 @@ public class GeminiService {
                 JsonNode node = quizzes.get(i);
                 String grammarName = node.path("grammarName").asText();
                 if (!allowedGrammarNames.contains(grammarName)) {
-                    grammarName = selected.get(i % selected.size()).name();
+                    grammarName = selected.get(i).name();
                 }
                 int answer = node.path("answer").asInt();
                 if (answer < 1 || answer > 5) throw new IllegalStateException("정답 번호가 올바르지 않습니다.");

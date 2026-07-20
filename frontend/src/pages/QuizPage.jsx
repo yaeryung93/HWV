@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router";
+import { Link } from "react-router";
 
 import Button from "../components/common/Button";
 import {
@@ -9,18 +9,29 @@ import {
 import "./lab/LabPages.css";
 
 function QuizPage() {
-  const location = useLocation();
-  const [questions, setQuestions] = useState(location.state?.questions || []);
-  const [isLoading, setIsLoading] = useState(questions.length === 0);
+  const [questions, setQuestions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [result, setResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (questions.length) return;
-    getCurrentJavaQuiz().then(setQuestions).catch((error) => setErrorMessage(error.message)).finally(() => setIsLoading(false));
-  }, [questions.length]);
+    let active = true;
+    getCurrentJavaQuiz()
+      .then((result) => {
+        if (active) setQuestions(result);
+      })
+      .catch((error) => {
+        if (active) setErrorMessage(error.message);
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   function handleAnswerChange(questionId, answer) {
     setSelectedAnswers((previousAnswers) => ({
@@ -33,7 +44,7 @@ function QuizPage() {
 
   async function handleSubmit() {
     if (questions.some((question) => !selectedAnswers[question.id])) {
-      setErrorMessage("5개 문제에 모두 답을 선택해 주세요.");
+      setErrorMessage("3개 문제에 모두 답을 선택해 주세요.");
       return;
     }
 
@@ -55,7 +66,7 @@ function QuizPage() {
       <div className="lab-page lab-page--narrow">
         <section className="large-empty">
           <strong>생성된 Java 문제가 없습니다.</strong>
-          <span>Java 파일을 분석하고 문제 5개를 먼저 생성해 주세요.</span>
+          <span>Java 파일을 분석하고 문제 3개를 먼저 생성해 주세요.</span>
           <Link className="lab-primary-link" to="/problems/new">
             ＋ Java 파일 분석하기
           </Link>
@@ -70,7 +81,7 @@ function QuizPage() {
         <div>
           <span className="lab-page__eyebrow">JAVA QUIZ</span>
           <h1>AI Java 퀴즈</h1>
-          <p>업로드한 Java 코드의 핵심 문법으로 만든 5개 문제입니다.</p>
+          <p>업로드한 Java 코드의 핵심 문법으로 만든 3개 문제입니다.</p>
         </div>
       </div>
 

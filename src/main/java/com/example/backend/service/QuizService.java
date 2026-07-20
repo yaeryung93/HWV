@@ -30,7 +30,11 @@ public class QuizService {
         return getLatestQuiz(userId);
     }
 
-    public List<Quiz> getLatestQuiz(Long userId) { return quizRepository.findTop5ByUserOrderByCreatedAtDescIdDesc(user(userId)); }
+    public List<Quiz> getLatestQuiz(Long userId) {
+        List<Quiz> quizzes = new ArrayList<>(quizRepository.findTop3ByUserOrderByCreatedAtDescIdDesc(user(userId)));
+        Collections.reverse(quizzes);
+        return quizzes;
+    }
 
     @Transactional
     public Map<String, Object> saveResult(QuizResultRequest request) {

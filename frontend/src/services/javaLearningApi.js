@@ -4,7 +4,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://sumquiz.onren
 
 function normalizeQuestions(result) {
   const questions = Array.isArray(result) ? result : result?.questions || result?.quizzes || [];
-  return questions.slice(0, 5).map((question) => ({
+  return questions.slice(0, 3).map((question) => ({
     id: question.id,
     question: question.question,
     grammarName: question.grammarName,
@@ -40,7 +40,7 @@ export async function createJavaQuiz(analysis) {
     body: JSON.stringify({ userId, code: analysis.sourceCode }),
   }));
   const questions = normalizeQuestions(result);
-  if (questions.length !== 5) throw new Error("AI가 생성한 문제 5개가 모두 필요합니다.");
+  if (questions.length !== 3) throw new Error("AI가 생성한 문제 3개가 모두 필요합니다.");
   return questions;
 }
 
