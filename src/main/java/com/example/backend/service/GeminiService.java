@@ -232,6 +232,7 @@ public class GeminiService {
             실제 코드를 실행하지 말고 Java 소스의 논리만 검토하라. 아래 문제와 테스트케이스 3개에 대해 예상 통과 여부를 판단한다.
             컴파일 불가능, TODO 유지, 핵심 문법 미사용, 요구사항 누락은 실패로 판단한다.
             정답 코드를 직접 제공하지 말고 실패 원인과 다음 수정 방향을 한국어로 설명한다.
+            hint는 300자 이내, improvement는 800자 이내, 각 테스트의 reason은 300자 이내로 핵심만 작성한다.
             JSON 형식: {"status":"passed|failed","hint":"","improvement":"",
             "tests":[{"id":1,"name":"","status":"passed|failed","input":"","expected":"","actual":"AI 예상 결과","reason":"판단 근거"}]}
             문제: %s

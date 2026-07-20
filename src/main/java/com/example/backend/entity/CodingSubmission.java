@@ -8,10 +8,10 @@ public class CodingSubmission {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
     @ManyToOne(fetch = FetchType.LAZY, optional = false) private User user;
     @ManyToOne(fetch = FetchType.LAZY, optional = false) private CodingProblem problem;
-    @Lob @Column(nullable = false) private String sourceCode;
-    @Lob @Column(nullable = false) private String testsJson;
-    @Lob private String hint;
-    @Lob private String improvement;
+    @Lob @Column(nullable = false, columnDefinition = "LONGTEXT") private String sourceCode;
+    @Lob @Column(nullable = false, columnDefinition = "LONGTEXT") private String testsJson;
+    @Lob @Column(columnDefinition = "LONGTEXT") private String hint;
+    @Lob @Column(columnDefinition = "LONGTEXT") private String improvement;
     private int passedCount;
     private int totalCount;
     private boolean passed;
