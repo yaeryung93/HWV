@@ -1105,6 +1105,7 @@
 
 .note-list article > div {
   display: flex;
+  min-width: 0;
   gap: 5px;
   flex-direction: column;
 }
@@ -1115,14 +1116,24 @@
   font-size: 12px;
 }
 
+.note-list p {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
 .note-list h2 {
   font-size: 17px;
 }
 
 .note-list a {
+  flex: 0 0 auto;
+  min-width: 56px;
   color: var(--color-primary);
   font-size: 13px;
   font-weight: 750;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .statistics-grid {
