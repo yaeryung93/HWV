@@ -118,13 +118,24 @@ public class GeminiService {
             return new GeneratedLearningContent(analysis, codingProblems);
         } catch (Exception e) {
             if (e instanceof WebClientResponseException webClientError) {
-                log.warn("Gemini API 요청 실패: model={}, status={}", model, webClientError.getStatusCode().value());
+                log.warn("Gemini API 요청 실패: model={}, status={}, response={}",
+                    model, webClientError.getStatusCode().value(), safeErrorResponse(webClientError));
                 throw webClientError;
             }
             if (e instanceof IllegalStateException state) throw state;
             log.error("Gemini 통합 학습 결과 처리 실패: {}", e.getClass().getSimpleName(), e);
             throw new IllegalStateException("Gemini 통합 학습 결과를 처리하지 못했습니다.", e);
         }
+    }
+
+    private String safeErrorResponse(WebClientResponseException exception) {
+        String response = exception.getResponseBodyAsString();
+        if (response == null || response.isBlank()) return "응답 본문 없음";
+        String sanitized = apiKey == null || apiKey.isBlank() ? response : response.replace(apiKey, "[API_KEY]");
+        sanitized = sanitized.replaceAll("(?i)(api[_-]?key|key)\\s*[:=]\\s*[^,}\\s]+", "$1=[MASKED]")
+            .replaceAll("[\\r\\n]+", " ")
+            .trim();
+        return sanitized.length() > 1000 ? sanitized.substring(0, 1000) + "..." : sanitized;
     }
 
     public String summarize(String text) {
