@@ -2048,9 +2048,7 @@
 }
 
 .workspace-problem-overview {
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.95fr);
-  gap: 18px;
+  display: block;
 }
 
 .problem-statement--intro,
@@ -2093,6 +2091,11 @@
   flex-direction: column;
   color: #63574f;
   background: #ffffff;
+}
+
+.workspace-right > .workspace-ai-summary {
+  min-height: 0;
+  margin: 0;
 }
 
 .workspace-ai-summary strong {

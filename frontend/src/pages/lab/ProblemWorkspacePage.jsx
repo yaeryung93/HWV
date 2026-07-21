@@ -137,13 +137,6 @@ function ProblemWorkspacePage() {
 
               <p>{problem.description}</p>
             </section>
-
-            {problem.summary && (
-              <div className="ai-summary-box workspace-ai-summary">
-                <strong>✦ AI 코드 요약</strong>
-                <p>{problem.summary}</p>
-              </div>
-            )}
           </div>
 
           <section className="problem-statement problem-detail-card">
@@ -272,6 +265,13 @@ function ProblemWorkspacePage() {
               </div>
             )}
           </section>
+
+          {problem.summary && (
+            <section className="ai-summary-box workspace-ai-summary">
+              <strong>✦ AI 코드 요약</strong>
+              <p>{problem.summary}</p>
+            </section>
+          )}
         </aside>
       </div>
     </div>
