@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.*;
@@ -113,7 +114,12 @@ public class GeminiService {
             List<CodingProblemDraft> codingProblems = parseCodingProblems(root.path("codingProblems"), selected, difficulty);
             return new GeneratedLearningContent(analysis, codingProblems);
         } catch (Exception e) {
+            if (e instanceof WebClientResponseException webClientError) {
+                log.warn("Gemini API 요청 실패: status={}", webClientError.getStatusCode().value());
+                throw webClientError;
+            }
             if (e instanceof IllegalStateException state) throw state;
+            log.error("Gemini 통합 학습 결과 처리 실패: {}", e.getClass().getSimpleName(), e);
             throw new IllegalStateException("Gemini 통합 학습 결과를 처리하지 못했습니다.", e);
         }
     }

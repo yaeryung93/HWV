@@ -1159,6 +1159,7 @@
 }
 
 .accuracy-ring {
+  --accuracy: 0deg;
   display: grid;
   width: 190px;
   height: 190px;
