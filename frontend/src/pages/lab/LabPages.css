@@ -1305,6 +1305,42 @@
   font-weight: 750;
 }
 
+.account-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.account-card h2 {
+  margin-top: 5px;
+  font-size: 19px;
+}
+
+.account-card p {
+  margin-top: 7px;
+  color: #7c837c;
+  font-size: 13px;
+}
+
+.account-card button {
+  flex-shrink: 0;
+  min-width: 104px;
+  min-height: 42px;
+  padding: 0 18px;
+  color: #c13e3e;
+  background: #ffffff;
+  border: 1px solid #e7b8b8;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.account-card button:hover {
+  color: #ffffff;
+  background: #c94b4b;
+  border-color: #c94b4b;
+}
+
 .github-card {
   margin-top: 18px;
 }
@@ -1487,5 +1523,14 @@
 
   .profile-card dl {
     grid-template-columns: 1fr;
+  }
+
+  .account-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .account-card button {
+    width: 100%;
   }
 }

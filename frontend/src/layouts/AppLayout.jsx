@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router";
 
 import { getProblems } from "../services/problemApi";
-import { clearSessionUser, getSessionUser } from "../services/session";
+import { getSessionUser } from "../services/session";
 import "./AppLayout.css";
 
 const navigationItems = [
@@ -41,12 +41,6 @@ function AppLayout() {
       : "lab-sidebar__link";
   }
 
-  function handleLogout() {
-    localStorage.removeItem("accessToken");
-    clearSessionUser();
-    navigate("/login");
-  }
-
   return (
     <div className="lab-shell">
       <header className="lab-header">
@@ -71,8 +65,9 @@ function AppLayout() {
           <button
             type="button"
             className="lab-profile-button"
-            onClick={handleLogout}
-            title="클릭하면 로그아웃합니다."
+            onClick={() => navigate("/profile")}
+            title="마이페이지로 이동"
+            aria-label={`${displayName}님의 마이페이지로 이동`}
           >
             <span className="lab-avatar">{displayName.slice(0, 1)}</span>
             <span>{displayName}</span>

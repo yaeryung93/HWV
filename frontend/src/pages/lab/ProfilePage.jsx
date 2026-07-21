@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
 import { connectGitHub, disconnectGitHub, getGitHubStatus, saveGitHubPublishToken } from "../../services/githubApi";
-import { getSessionUser } from "../../services/session";
+import { clearSessionUser, getSessionUser } from "../../services/session";
 import "./LabPages.css";
 
 function ProfilePage() {
+  const navigate = useNavigate();
   const user = getSessionUser();
   const displayName = user?.name || "사용자";
   const [repositoryUrl, setRepositoryUrl] = useState("");
@@ -52,6 +54,16 @@ function ProfilePage() {
     }
   }
 
+  function handleLogout() {
+    const shouldLogout = window.confirm("로그아웃하시겠습니까?");
+
+    if (!shouldLogout) return;
+
+    localStorage.removeItem("accessToken");
+    clearSessionUser();
+    navigate("/login", { replace: true });
+  }
+
   return (
     <div className="lab-page lab-page--narrow">
       <div className="lab-page__heading">
@@ -83,6 +95,15 @@ function ProfilePage() {
             <dd>활성</dd>
           </div>
         </dl>
+      </section>
+
+      <section className="surface-card account-card">
+        <div>
+          <span className="lab-page__eyebrow">ACCOUNT</span>
+          <h2>계정 관리</h2>
+          <p>현재 기기에서 안전하게 로그아웃할 수 있습니다.</p>
+        </div>
+        <button type="button" onClick={handleLogout}>로그아웃</button>
       </section>
 
       <section className="surface-card github-card">
