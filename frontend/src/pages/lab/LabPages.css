@@ -1354,6 +1354,26 @@
   font-size: 12px;
 }
 
+.github-success {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border: 1px solid #b9d9ae;
+  border-radius: 8px;
+  background: #f0f8ed;
+  color: #3f7c31;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.github-connection .github-connection__status {
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #e9f5e5;
+  color: #4c8b3c;
+  font-weight: 800;
+}
+
 .github-connection a,
 .github-publish-box a {
   color: var(--color-primary);

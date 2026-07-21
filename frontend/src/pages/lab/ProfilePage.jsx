@@ -11,6 +11,9 @@ function ProfilePage() {
   const [githubStatus, setGitHubStatus] = useState({ connected: false });
   const [isConnecting, setIsConnecting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [connectionCompleted] = useState(
+    () => new URLSearchParams(window.location.search).get("github") === "connected",
+  );
 
   useEffect(() => {
     const parameters = new URLSearchParams(window.location.search);
@@ -86,14 +89,20 @@ function ProfilePage() {
         </div>
 
         {githubStatus.connected ? (
-          <div className="github-connection">
-            <div>
-              <strong>{githubStatus.owner}/{githubStatus.repository}</strong>
-              <span>{githubStatus.privateRepository ? "Private 저장소" : "Public 저장소"}</span>
+          <>
+            {connectionCompleted && (
+              <p className="github-success" role="status">GitHub 저장소 연동이 완료되었습니다.</p>
+            )}
+            <div className="github-connection">
+              <div>
+                <span className="github-connection__status">GitHub 연동됨</span>
+                <strong>{githubStatus.owner}/{githubStatus.repository}</strong>
+                <span>{githubStatus.privateRepository ? "Private 저장소" : "Public 저장소"}</span>
+              </div>
+              <a href={githubStatus.url} target="_blank" rel="noreferrer">저장소 보기</a>
+              <button type="button" onClick={handleDisconnect}>연결 해제</button>
             </div>
-            <a href={githubStatus.url} target="_blank" rel="noreferrer">저장소 보기</a>
-            <button type="button" onClick={handleDisconnect}>연결 해제</button>
-          </div>
+          </>
         ) : (
           <form className="github-connect-form" onSubmit={handleConnect}>
             <label htmlFor="github-repository">GitHub 저장소 URL</label>
