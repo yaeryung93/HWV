@@ -180,9 +180,14 @@ public class GitHubIntegrationService {
 
     private PrivateKey privateKey() throws Exception {
         String normalized = privateKeyPem.replace("\\n", "\n").trim();
+        if (normalized.length() >= 2 && ((normalized.startsWith("\"") && normalized.endsWith("\""))
+            || (normalized.startsWith("'") && normalized.endsWith("'")))) {
+            normalized = normalized.substring(1, normalized.length() - 1).trim();
+        }
         boolean pkcs1 = normalized.contains("BEGIN RSA PRIVATE KEY");
         String base64 = normalized.replaceAll("-----BEGIN (?:RSA )?PRIVATE KEY-----", "")
             .replaceAll("-----END (?:RSA )?PRIVATE KEY-----", "").replaceAll("\\s", "");
+        if (base64.isBlank()) throw new IllegalArgumentException("GitHub App private key PEM 내용이 비어 있습니다.");
         byte[] key = Base64.getDecoder().decode(base64);
         if (pkcs1) key = wrapPkcs1(key);
         return KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(key));
@@ -191,6 +196,7 @@ public class GitHubIntegrationService {
     private byte[] wrapPkcs1(byte[] pkcs1) throws Exception {
         byte[] algorithm = Base64.getDecoder().decode("MA0GCSqGSIb3DQEBAQUA");
         ByteArrayOutputStream content = new ByteArrayOutputStream();
+        content.write(0x02); content.write(0x01); content.write(0x00);
         content.write(algorithm);
         content.write(0x04); writeLength(content, pkcs1.length); content.write(pkcs1);
         ByteArrayOutputStream result = new ByteArrayOutputStream();
