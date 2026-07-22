@@ -29,6 +29,7 @@
   height: 100px;
   object-fit: cover;
   object-position: center 51%;
+  transform: translateY(-26px);
 }
 
 .signup-page__main {

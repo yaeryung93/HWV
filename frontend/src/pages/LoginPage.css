@@ -2,9 +2,7 @@
   display: grid;
   min-height: 100vh;
   padding: 34px;
-  background:
-    radial-gradient(circle at 18% 14%, #fff7e9 0 18%, transparent 40%),
-    #fffaf3;
+  background: #fffaf3;
   place-items: center;
 }
 
@@ -28,10 +26,7 @@
   justify-content: center;
   min-height: 650px;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 18% 20%, rgb(255 255 255 / 68%) 0 9%, transparent 9.3%),
-    radial-gradient(circle at 86% 24%, rgb(255 255 255 / 50%) 0 6%, transparent 6.3%),
-    linear-gradient(150deg, #fff8ed 0%, #ffe9d4 100%);
+  background: #fff1e3;
   border-right: 1px solid #f3dfcf;
 }
 
@@ -64,7 +59,7 @@
   left: 50%;
   width: 230px;
   height: 104px;
-  overflow: hidden;
+  overflow: visible;
   transform: translateX(-50%);
 }
 

@@ -87,10 +87,6 @@ function ProfilePage() {
             <dd>Java</dd>
           </div>
           <div>
-            <dt>목표 난이도</dt>
-            <dd>문제 생성 시 선택</dd>
-          </div>
-          <div>
             <dt>가입 상태</dt>
             <dd>활성</dd>
           </div>
