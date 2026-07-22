@@ -2065,9 +2065,9 @@
 
 .problem-statement--intro {
   display: flex;
-  justify-content: center;
-  min-height: 176px;
-  padding: 24px 4px;
+  justify-content: flex-start;
+  min-height: 0;
+  padding: 14px 4px 16px;
   flex-direction: column;
   background: transparent;
   border-color: transparent;
@@ -2075,7 +2075,7 @@
 }
 
 .problem-statement--intro .problem-statement__header {
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .problem-statement--intro .problem-statement__header h1 {
