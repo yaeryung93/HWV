@@ -170,7 +170,7 @@ public class JavaCodeExecutionService {
                     StringBuilder result = new StringBuilder("[");
                     for (int i = 0; i < Array.getLength(value); i++) {
                         if (i > 0) result.append(", ");
-                        result.append(String.valueOf(Array.get(value, i)));
+                        result.append(format(Array.get(value, i)));
                     }
                     return result.append(']').toString();
                 }
@@ -193,7 +193,8 @@ public class JavaCodeExecutionService {
                 JsonNode values = objectMapper.readTree(rawValue);
                 if (!values.isArray()) throw new IllegalArgumentException("배열 인자는 JSON 배열 형식이어야 합니다.");
                 List<String> elements = new ArrayList<>();
-                values.forEach(value -> elements.add(javaLiteral(elementType, value.asText())));
+                values.forEach(value -> elements.add(javaLiteral(elementType,
+                    value.isContainerNode() ? value.toString() : value.asText())));
                 return "new " + elementType + "[]{" + String.join(", ", elements) + "}";
             }
             return switch (type) {

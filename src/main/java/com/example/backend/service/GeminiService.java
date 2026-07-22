@@ -79,8 +79,9 @@ public class GeminiService {
             각 코딩 문제에는 서로 다른 테스트를 정확히 3개 넣고 input과 expected를 짧은 문자열로 작성한다.
             프로그래머스 방식으로 사용자는 Solution 클래스의 solution 메서드만 구현하고 반환한다.
             methodName은 항상 solution이다. returnType과 parameterTypes는 실제 starterCode 선언과 정확히 일치해야 한다.
-            지원 타입은 int, long, double, boolean, String과 이 타입들의 1차원 배열만 사용한다.
+            지원 타입은 int, long, double, boolean, String과 이 타입들의 1차원 또는 2차원 배열만 사용한다.
             입력값의 형태와 parameterTypes를 반드시 일치시킨다. 숫자, boolean, JSON 배열을 편의상 String으로 선언하지 않는다.
+            2차원 배열을 사용하는 문제는 int[][], long[][], double[][], boolean[][], String[][] 중 실제 값에 맞는 타입을 사용한다.
             예: 15는 int, 3000000000은 long, 1.5는 double, true는 boolean, [1,2,3]은 int[], [1.5,2.5]는 double[], ["a","b"]는 String[]이다.
             실제 문자열 입력일 때만 String을 사용하며 사용자가 solution 안에서 숫자나 배열을 직접 파싱하게 만들지 않는다.
             starterCode는 public class Solution과 public solution 메서드를 포함하고 컴파일 가능한 기본 return 값을 넣되 정답 로직은 TODO로 남긴다.
@@ -218,7 +219,9 @@ public class GeminiService {
 
     private String supportedType(String type) {
         String normalized = type == null ? "" : type.replace(" ", "").trim();
-        if (!Set.of("int", "long", "double", "boolean", "String", "int[]", "long[]", "double[]", "boolean[]", "String[]").contains(normalized)) {
+        if (!Set.of("int", "long", "double", "boolean", "String",
+            "int[]", "long[]", "double[]", "boolean[]", "String[]",
+            "int[][]", "long[][]", "double[][]", "boolean[][]", "String[][]").contains(normalized)) {
             throw new IllegalStateException("지원하지 않는 solution 타입입니다: " + normalized);
         }
         return normalized;
@@ -241,6 +244,22 @@ public class GeminiService {
                 catch (Exception ignored) { return objectMapper.getNodeFactory().textNode(value); }
             }).toList();
             if (nodes.stream().allMatch(JsonNode::isArray)) {
+                boolean twoDimensional = nodes.stream()
+                    .flatMap(node -> java.util.stream.StreamSupport.stream(node.spliterator(), false))
+                    .anyMatch(JsonNode::isArray);
+                if (twoDimensional) {
+                    List<JsonNode> elements = new ArrayList<>();
+                    nodes.forEach(rows -> rows.forEach(row -> {
+                        if (row.isArray()) row.forEach(elements::add);
+                    }));
+                    if (elements.isEmpty()) return fallback.endsWith("[][]") ? fallback : "int[][]";
+                    if (elements.stream().allMatch(JsonNode::isBoolean)) return "boolean[][]";
+                    if (elements.stream().allMatch(JsonNode::isIntegralNumber)) {
+                        return elements.stream().allMatch(value -> value.canConvertToInt()) ? "int[][]" : "long[][]";
+                    }
+                    if (elements.stream().allMatch(JsonNode::isNumber)) return "double[][]";
+                    return "String[][]";
+                }
                 List<JsonNode> elements = new ArrayList<>();
                 nodes.forEach(array -> array.forEach(elements::add));
                 if (elements.isEmpty()) return fallback.endsWith("[]") ? fallback : "int[]";
