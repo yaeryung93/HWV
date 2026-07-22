@@ -120,7 +120,6 @@ function WelcomePage() {
         </section>
 
         <aside className="introduction-page__visual" aria-label="서버 준비 상태">
-          <div className="introduction-page__orb" />
           <img className="introduction-page__large-logo" src="/images/hwv-logo-cutout.png" alt="" />
 
           <div className="introduction-page__server">

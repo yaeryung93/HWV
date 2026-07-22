@@ -34,6 +34,7 @@
   height: 112px;
   object-fit: cover;
   object-position: center 51%;
+  transform: translateY(-28px);
 }
 
 .introduction-page__hero {
@@ -116,24 +117,12 @@
   border-left: 1px solid var(--intro-border);
 }
 
-.introduction-page__orb {
-  position: absolute;
-  top: 9%;
-  left: 50%;
-  width: min(31vw, 470px);
-  height: min(31vw, 470px);
-  background: var(--intro-primary);
-  border-radius: 50%;
-  filter: blur(2px);
-  opacity: 0.05;
-  transform: translateX(-50%);
-}
-
 .introduction-page__large-logo {
   position: relative;
-  width: min(29vw, 420px);
-  aspect-ratio: 1;
-  object-fit: contain;
+  width: min(31vw, 450px);
+  height: min(13vw, 190px);
+  object-fit: cover;
+  object-position: center 51%;
   animation: introduction-float 3.8s ease-in-out infinite;
 }
 
@@ -251,8 +240,7 @@
 @media (max-width: 768px) {
   .introduction-page__layout { grid-template-columns: 1fr; }
   .introduction-page__visual { order: -1; min-height: 430px; border-bottom: 1px solid var(--intro-border); border-left: 0; }
-  .introduction-page__large-logo { width: min(70vw, 310px); }
-  .introduction-page__orb { width: 330px; height: 330px; }
+  .introduction-page__large-logo { width: min(76vw, 360px); height: min(31vw, 148px); }
   .introduction-page__server { margin-top: -35px; }
   .introduction-page__content { padding: 34px 22px 48px; }
   .introduction-page__hero { padding: 45px 0 34px; }
