@@ -41,12 +41,27 @@ function StatisticsPage() {
     { length: 7 },
     (_, index) => statistics?.weeklyAttempts?.[index] ?? 0,
   );
-  const weeklyMaximum = Math.max(...weeklyAttempts, 1);
-  const weeklyPoints = weeklyAttempts.map((value, index) => ({
+  const dailyAccuracy = Array.from({ length: 7 }, (_, index) => {
+    const item = statistics?.dailyAccuracy?.[index];
+    return {
+      accuracy: Math.max(0, Math.min(100, item?.accuracy ?? 0)),
+      correct: item?.correct ?? 0,
+      total: item?.total ?? weeklyAttempts[index],
+    };
+  });
+  const accuracyEmoji = (value) => {
+    if (value <= 20) return "😭";
+    if (value <= 40) return "😢";
+    if (value <= 60) return "😐";
+    if (value <= 80) return "😏";
+    return "🤭";
+  };
+  const weeklyPoints = dailyAccuracy.map((item, index) => ({
     day: weekDays[index],
-    value,
-    x: 60 + index * 180,
-    y: 130 - (value / weeklyMaximum) * 95,
+    ...item,
+    emoji: accuracyEmoji(item.accuracy),
+    x: 70 + index * (1060 / 6),
+    y: 135 - item.accuracy,
   }));
   const weeklyPolyline = weeklyPoints.map((point) => `${point.x},${point.y}`).join(" ");
 
@@ -133,25 +148,28 @@ function StatisticsPage() {
         </section>
 
         <section className="surface-card weekly-chart">
-          <h2>최근 7일 제출</h2>
+          <h2>최근 7일 일별 정답률</h2>
           <div className="weekly-chart__line">
             <svg
               viewBox="0 0 1200 180"
               role="img"
-              aria-label={`최근 7일 제출 횟수: ${weeklyAttempts.join(", ")}`}
+              aria-label={`최근 7일 일별 정답률: ${dailyAccuracy.map((item) => item.accuracy + "%").join(", ")}`}
             >
-              {[35, 82, 130].map((y) => (
-                <line className="weekly-chart__grid-line" x1="60" x2="1140" y1={y} y2={y} key={y} />
+              {[0, 20, 40, 60, 80, 100].map((percentage) => (
+                <g key={percentage}>
+                  <line className="weekly-chart__grid-line" x1="70" x2="1130" y1={135 - percentage} y2={135 - percentage} />
+                  <text className="weekly-chart__axis-label" x="48" y={139 - percentage}>{percentage}%</text>
+                </g>
               ))}
               <polyline className="weekly-chart__polyline" points={weeklyPolyline} />
               {weeklyPoints.map((point) => (
                 <g key={point.day}>
-                  <circle className="weekly-chart__point-halo" cx={point.x} cy={point.y} r="7" />
-                  <circle className="weekly-chart__point" cx={point.x} cy={point.y} r="4" />
-                  <text className="weekly-chart__value" x={point.x} y={Math.max(17, point.y - 13)}>
-                    {point.value}
+                  <text className="weekly-chart__value" x={point.x} y={Math.max(18, point.y - 14)}>
+                    {point.accuracy}%
                   </text>
+                  <text className="weekly-chart__emoji" x={point.x} y={point.y + 6}>{point.emoji}</text>
                   <text className="weekly-chart__day" x={point.x} y="168">{point.day}</text>
+                  <title>{`${point.day}요일: ${point.correct}/${point.total} 정답, 정답률 ${point.accuracy}%`}</title>
                 </g>
               ))}
             </svg>

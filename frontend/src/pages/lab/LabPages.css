@@ -1259,27 +1259,28 @@
   vector-effect: non-scaling-stroke;
 }
 
-.weekly-chart__point-halo {
-  fill: #fff1e7;
-}
-
-.weekly-chart__point {
-  fill: #ffffff;
-  stroke: #ec6b2d;
-  stroke-width: 3;
-  vector-effect: non-scaling-stroke;
-}
-
 .weekly-chart__value,
-.weekly-chart__day {
+.weekly-chart__day,
+.weekly-chart__emoji,
+.weekly-chart__axis-label {
   text-anchor: middle;
   font-family: inherit;
 }
 
 .weekly-chart__value {
   fill: #ec6b2d;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
+}
+
+.weekly-chart__emoji {
+  font-size: 19px;
+}
+
+.weekly-chart__axis-label {
+  fill: #a19a94;
+  font-size: 9px;
+  text-anchor: end;
 }
 
 .weekly-chart__day {

@@ -87,12 +87,29 @@ public class QuizService {
             result.put("categoryAccuracy", byGrammar.entrySet().stream().map(e -> Map.of("name", e.getKey(), "value",
                 Math.round(e.getValue().stream().filter(QuizAttempt::isCorrect).count() * 100.0 / e.getValue().size()))).toList());
         }
-        List<Long> weekly = new ArrayList<>(); LocalDate today = LocalDate.now();
+        List<Long> weekly = new ArrayList<>(); List<Map<String, Object>> dailyAccuracy = new ArrayList<>(); LocalDate today = LocalDate.now();
         for (int i = 6; i >= 0; i--) { LocalDate day = today.minusDays(i); LocalDateTime start = day.atStartOfDay(), end = day.plusDays(1).atStartOfDay();
-            weekly.add(codingAttempts.isEmpty()
-                ? attempts.stream().filter(a -> !a.getAnsweredAt().isBefore(start) && a.getAnsweredAt().isBefore(end)).count()
-                : codingAttempts.stream().filter(a -> !a.getSubmittedAt().isBefore(start) && a.getSubmittedAt().isBefore(end)).count()); }
-        result.put("weeklyAttempts", weekly); return result;
+            long dailyTotal, dailyCorrect;
+            if (codingAttempts.isEmpty()) {
+                List<QuizAttempt> dailyAttempts = attempts.stream()
+                    .filter(a -> !a.getAnsweredAt().isBefore(start) && a.getAnsweredAt().isBefore(end)).toList();
+                dailyTotal = dailyAttempts.size();
+                dailyCorrect = dailyAttempts.stream().filter(QuizAttempt::isCorrect).count();
+            } else {
+                List<CodingSubmission> dailyAttempts = codingAttempts.stream()
+                    .filter(a -> !a.getSubmittedAt().isBefore(start) && a.getSubmittedAt().isBefore(end)).toList();
+                dailyTotal = dailyAttempts.size();
+                dailyCorrect = dailyAttempts.stream().filter(CodingSubmission::isPassed).count();
+            }
+            weekly.add(dailyTotal);
+            dailyAccuracy.add(Map.of(
+                "date", day.toString(),
+                "correct", dailyCorrect,
+                "total", dailyTotal,
+                "accuracy", dailyTotal == 0 ? 0 : Math.round(dailyCorrect * 100.0 / dailyTotal)
+            ));
+        }
+        result.put("weeklyAttempts", weekly); result.put("dailyAccuracy", dailyAccuracy); return result;
     }
 
     private Map<String, Object> attemptMap(QuizAttempt a) {
