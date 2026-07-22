@@ -89,6 +89,12 @@ public class GeminiService {
             main 메서드, Scanner, System.in, System.out은 starterCode에 넣지 않는다. 서버가 숨겨진 실행 코드를 자동으로 붙인다.
             각 테스트의 arguments는 parameterTypes 순서와 개수가 같은 문자열 배열이다. 숫자와 boolean은 평문, String은 따옴표 없는 값, 배열은 JSON 배열 문자열로 작성한다.
             input은 화면 표시용 입력, expected는 solution의 기대 반환값을 문자열로 작성한다.
+            난이도는 문제 설명의 길이가 아니라 해결에 필요한 알고리즘적 사고, 조건 조합, 반복 구조와 효율성을 기준으로 판단한다.
+            쉬움은 프로그래머스 Lv.0~Lv.1 수준이다. 단순 조건문, 반복문, 배열 순회로 해결하며 한 번의 순회로 풀 수 있고 복잡한 알고리즘은 요구하지 않는다.
+            보통은 프로그래머스 Lv.1~Lv.2 수준이다. 여러 조건의 조합, 중첩 반복, 문자열·배열 가공, 간단한 정렬·누적·빈도 계산을 요구할 수 있다.
+            어려움은 프로그래머스 Lv.3~Lv.4 수준이다. 여러 단계의 알고리즘적 사고, 복잡한 예외 조건, 시간 복잡도와 효율성을 고려해야 한다.
+            Lv.1 수준에서 쉬움은 직관적인 단일 순회 문제로, 보통은 조건 조합이나 추가 데이터 가공이 필요한 문제로 구분한다.
+            난이도를 높이기 위해 탐지 목록에 없는 Java 문법을 억지로 요구해서는 안 되며, 업로드 코드에서 실제 탐지된 문법 안에서 문제의 사고 난이도를 조절한다.
             난이도 규칙은 반드시 지킨다: %s
             JSON 이외의 설명이나 마크다운 코드 블록은 출력하지 않는다.
 
@@ -324,8 +330,17 @@ public class GeminiService {
 
     private String difficultyInstruction(String difficulty) {
         return "균형".equals(difficulty)
-            ? "첫 번째는 쉬움, 두 번째는 보통, 세 번째는 어려움으로 생성한다."
-            : "세 문제 모두 " + difficulty + " 난이도로 생성한다.";
+            ? "첫 번째는 쉬움(프로그래머스 Lv.0~1), 두 번째는 보통(Lv.1~2), 세 번째는 어려움(Lv.3~4)으로 생성한다."
+            : "세 문제 모두 " + difficulty + " 난이도로 생성한다. " + difficultyLevelRange(difficulty);
+    }
+
+    private String difficultyLevelRange(String difficulty) {
+        return switch (difficulty) {
+            case "쉬움" -> "프로그래머스 Lv.0~Lv.1 중 직관적인 단일 순회 수준을 지킨다.";
+            case "보통" -> "프로그래머스 Lv.1~Lv.2 수준으로 조건 조합이나 데이터 가공을 포함한다.";
+            case "어려움" -> "프로그래머스 Lv.3~Lv.4 수준으로 다단계 사고와 효율성 고려를 요구한다.";
+            default -> "";
+        };
     }
 
     private String difficultyForIndex(String difficulty, int index) {
