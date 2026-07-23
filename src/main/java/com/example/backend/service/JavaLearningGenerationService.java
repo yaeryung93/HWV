@@ -1,12 +1,15 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.CodingProblemDraft;
+import com.example.backend.dto.CodingProblemTranslationDraft;
 import com.example.backend.dto.GeneratedLearningContent;
 import com.example.backend.dto.JavaAnalysisResponse;
 import com.example.backend.entity.CodingProblem;
+import com.example.backend.entity.CodingProblemTranslation;
 import com.example.backend.entity.JavaAnalysisCache;
 import com.example.backend.entity.User;
 import com.example.backend.repository.CodingProblemRepository;
+import com.example.backend.repository.CodingProblemTranslationRepository;
 import com.example.backend.repository.JavaAnalysisCacheRepository;
 import com.example.backend.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -20,19 +23,22 @@ import java.util.List;
 
 @Service
 public class JavaLearningGenerationService {
-    private static final String GENERATION_RULE_VERSION = "typed-arguments-v2";
+    private static final String GENERATION_RULE_VERSION = "multilingual-problems-v3";
     private final GeminiService geminiService;
     private final UserRepository userRepository;
     private final CodingProblemRepository problemRepository;
+    private final CodingProblemTranslationRepository translationRepository;
     private final JavaAnalysisCacheRepository cacheRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public JavaLearningGenerationService(GeminiService geminiService, UserRepository userRepository,
                                          CodingProblemRepository problemRepository,
+                                         CodingProblemTranslationRepository translationRepository,
                                          JavaAnalysisCacheRepository cacheRepository) {
         this.geminiService = geminiService;
         this.userRepository = userRepository;
         this.problemRepository = problemRepository;
+        this.translationRepository = translationRepository;
         this.cacheRepository = cacheRepository;
     }
 
@@ -53,6 +59,7 @@ public class JavaLearningGenerationService {
 
         List<CodingProblem> savedProblems = problemRepository.saveAll(generated.codingProblems().stream()
             .map(draft -> toEntity(user, draft)).toList());
+        saveTranslations(savedProblems, generated.problemTranslations());
         JavaAnalysisCache cache = new JavaAnalysisCache();
         cache.setUser(user);
         cache.setSourceHash(sourceHash);
@@ -88,6 +95,28 @@ public class JavaLearningGenerationService {
         problem.setDifficulty(draft.difficulty());
         problem.setTestsJson(write(draft.tests()));
         return problem;
+    }
+
+    private void saveTranslations(List<CodingProblem> problems,
+                                  java.util.Map<String, List<CodingProblemTranslationDraft>> translations) {
+        List<CodingProblemTranslation> entities = new java.util.ArrayList<>();
+        for (String language : List.of("ko", "en", "ja")) {
+            List<CodingProblemTranslationDraft> languageTranslations = translations.get(language);
+            if (languageTranslations == null || languageTranslations.size() != problems.size()) {
+                throw new IllegalStateException(language + " 문제 번역을 저장할 수 없습니다.");
+            }
+            for (int index = 0; index < problems.size(); index++) {
+                CodingProblemTranslationDraft draft = languageTranslations.get(index);
+                CodingProblemTranslation entity = new CodingProblemTranslation();
+                entity.setProblem(problems.get(index)); entity.setLanguage(language);
+                entity.setGrammarName(draft.grammarName()); entity.setTitle(draft.title());
+                entity.setDescription(draft.description()); entity.setSummary(draft.summary());
+                entity.setRequirementsJson(write(draft.requirements()));
+                entity.setTestNamesJson(write(draft.testNames()));
+                entities.add(entity);
+            }
+        }
+        translationRepository.saveAll(entities);
     }
 
     private List<JavaAnalysisResponse.Grammar> readGrammars(String json) {

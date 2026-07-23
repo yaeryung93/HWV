@@ -34,7 +34,7 @@ public class GeminiService {
     private String callGemini(String prompt) {
         Map<String, Object> body = Map.of(
             "contents", List.of(Map.of("parts", List.of(Map.of("text", prompt)))),
-            "generationConfig", Map.of("responseMimeType", "application/json", "temperature", 0.2, "maxOutputTokens", 8192)
+            "generationConfig", Map.of("responseMimeType", "application/json", "temperature", 0.2, "maxOutputTokens", 16384)
         );
         Map<?, ?> response = webClient.post()
             .uri("/v1beta/models/{model}:generateContent", model)
@@ -71,7 +71,8 @@ public class GeminiService {
         String difficulty = normalizeDifficulty(requestedDifficulty);
         String responseLanguage = responseLanguage(language);
         String prompt = """
-            모든 설명, 문제 제목, 문제 본문, 제약 조건과 힌트는 반드시 %s로 작성하라.
+            summary, grammars, codingProblems의 기본 설명과 제목은 반드시 %s로 작성하라.
+            단, translations의 ko, en, ja 항목은 각 키에 지정된 언어로 작성하라.
             Java 코드, 클래스명, 메서드명, 변수명, JSON 필드명과 테스트 값은 번역하지 마라.
             다음 Java 코드에 대한 학습 콘텐츠를 한 번에 생성하라.
             서버가 실제 코드에서 탐지한 문법 3개만 사용하고 목록 밖의 Java 일반 지식은 추가하지 않는다.
@@ -101,6 +102,13 @@ public class GeminiService {
             Lv.1 수준에서 쉬움은 직관적인 단일 순회 문제로, 보통은 조건 조합이나 추가 데이터 가공이 필요한 문제로 구분한다.
             난이도를 높이기 위해 탐지 목록에 없는 Java 문법을 억지로 요구해서는 안 되며, 업로드 코드에서 실제 탐지된 문법 안에서 문제의 사고 난이도를 조절한다.
             난이도 규칙은 반드시 지킨다: %s
+            4. translations: codingProblems 3개의 자연어 표시 내용을 한국어(ko), 영어(en), 일본어(ja)로 모두 제공한다.
+            ko, en, ja 배열은 각각 정확히 3개이며 codingProblems와 같은 순서여야 한다.
+            각 번역에는 grammarName, title, description, summary, requirements, testNames만 포함한다.
+            summary는 학습 목표를 설명하는 160자 이내의 한 문장으로 작성한다.
+            번역 description은 600자 이내, requirements는 원본과 같은 개수이며 각 항목은 120자 이내로 작성한다.
+            testNames는 해당 문제의 테스트 3개와 같은 순서로 정확히 3개를 작성한다.
+            코드, 메서드명, 변수명, Java 타입, 입력값, 기대 출력값, 숫자는 번역하거나 translations에 중복하지 않는다.
             JSON 이외의 설명이나 마크다운 코드 블록은 출력하지 않는다.
 
             JSON 형식:
@@ -108,7 +116,10 @@ public class GeminiService {
             "codingProblems":[{"title":"","description":"","requirements":[""],"inputExample":"","outputExample":"",
             "methodName":"solution","returnType":"int","parameterTypes":["int"],
             "starterCode":"public class Solution {\\n    public int solution(int value) {\\n        // TODO\\n        return 0;\\n    }\\n}","difficulty":"쉬움|보통|어려움",
-            "tests":[{"name":"기본 케이스","input":"5","arguments":["5"],"expected":"10"}]}]}
+            "tests":[{"name":"기본 케이스","input":"5","arguments":["5"],"expected":"10"}]}],
+            "translations":{"ko":[{"grammarName":"","title":"","description":"","summary":"","requirements":[""],"testNames":["", "", ""]}],
+            "en":[{"grammarName":"","title":"","description":"","summary":"","requirements":[""],"testNames":["", "", ""]}],
+            "ja":[{"grammarName":"","title":"","description":"","summary":"","requirements":[""],"testNames":["", "", ""]}]}}
 
             탐지 목록: %s
             Java 코드: %s
@@ -128,7 +139,9 @@ public class GeminiService {
                 root.path("summary").asText("업로드한 Java 코드를 분석했습니다."), grammars, code);
 
             List<CodingProblemDraft> codingProblems = parseCodingProblems(root.path("codingProblems"), selected, difficulty);
-            return new GeneratedLearningContent(analysis, codingProblems);
+            Map<String, List<CodingProblemTranslationDraft>> translations =
+                parseProblemTranslations(root.path("translations"), codingProblems);
+            return new GeneratedLearningContent(analysis, codingProblems, translations);
         } catch (Exception e) {
             if (e instanceof WebClientResponseException webClientError) {
                 log.warn("Gemini API 요청 실패: model={}, status={}, response={}",
@@ -201,6 +214,40 @@ public class GeminiService {
         List<String> values = new ArrayList<>();
         if (node.isArray()) node.forEach(item -> values.add(item.asText()));
         return values;
+    }
+
+    private Map<String, List<CodingProblemTranslationDraft>> parseProblemTranslations(
+            JsonNode translationsNode, List<CodingProblemDraft> problems) {
+        Map<String, List<CodingProblemTranslationDraft>> translations = new LinkedHashMap<>();
+        for (String language : List.of("ko", "en", "ja")) {
+            JsonNode languageNodes = translationsNode.path(language);
+            if (!languageNodes.isArray() || languageNodes.size() != problems.size()) {
+                throw new IllegalStateException(language + " 문제 번역이 정확히 3개가 아닙니다.");
+            }
+            List<CodingProblemTranslationDraft> languageTranslations = new ArrayList<>();
+            for (int index = 0; index < problems.size(); index++) {
+                CodingProblemDraft problem = problems.get(index);
+                JsonNode node = languageNodes.get(index);
+                List<String> requirements = readTextArray(node.path("requirements"));
+                List<String> testNames = readTextArray(node.path("testNames"));
+                if (requirements.size() != problem.requirements().size()) {
+                    throw new IllegalStateException(language + " 번역의 제약 조건 수가 원본과 다릅니다.");
+                }
+                if (testNames.size() != problem.tests().size()) {
+                    throw new IllegalStateException(language + " 번역의 테스트 이름 수가 원본과 다릅니다.");
+                }
+                languageTranslations.add(new CodingProblemTranslationDraft(
+                    requiredText(node, "grammarName", language + " 문법명"),
+                    requiredText(node, "title", language + " 제목"),
+                    requiredText(node, "description", language + " 설명"),
+                    requiredText(node, "summary", language + " 요약"),
+                    requirements,
+                    testNames
+                ));
+            }
+            translations.put(language, languageTranslations);
+        }
+        return translations;
     }
 
     private String safeErrorResponse(WebClientResponseException exception) {
