@@ -33,6 +33,10 @@ export function getDashboardSummary() {
   return request(`/api/me/dashboard?userId=${getUserId()}`);
 }
 
+export function getStudyStreak() {
+  return request(`/api/me/streak?userId=${getUserId()}`);
+}
+
 export function getWrongNotes() {
   return request(`/api/me/wrong-notes?userId=${getUserId()}`);
 }

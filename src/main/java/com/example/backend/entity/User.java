@@ -1,6 +1,7 @@
 package com.example.backend.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "users")
@@ -21,6 +22,14 @@ public class User {
 
     @Column(unique = true)
     private String googleSubject;
+
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private int currentStreak;
+
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private int longestStreak;
+
+    private LocalDate lastStudyDate;
 
     public User() {
     }
@@ -59,6 +68,30 @@ public class User {
 
     public void setGoogleSubject(String googleSubject) {
         this.googleSubject = googleSubject;
+    }
+
+    public int getCurrentStreak() {
+        return currentStreak;
+    }
+
+    public void setCurrentStreak(int currentStreak) {
+        this.currentStreak = currentStreak;
+    }
+
+    public int getLongestStreak() {
+        return longestStreak;
+    }
+
+    public void setLongestStreak(int longestStreak) {
+        this.longestStreak = longestStreak;
+    }
+
+    public LocalDate getLastStudyDate() {
+        return lastStudyDate;
+    }
+
+    public void setLastStudyDate(LocalDate lastStudyDate) {
+        this.lastStudyDate = lastStudyDate;
     }
 
 }

@@ -17,15 +17,18 @@ public class ProblemGenerationService {
     private final CodingProblemTranslationRepository translationRepository;
     private final UserRepository userRepository;
     private final GeminiService geminiService;
+    private final StudyStreakService studyStreakService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public ProblemGenerationService(JavaCodeExecutionService executionService, CodingProblemRepository problemRepository,
                                     CodingSubmissionRepository submissionRepository,
                                     CodingProblemTranslationRepository translationRepository,
-                                    UserRepository userRepository, GeminiService geminiService) {
+                                    UserRepository userRepository, GeminiService geminiService,
+                                    StudyStreakService studyStreakService) {
         this.executionService = executionService; this.problemRepository = problemRepository;
         this.submissionRepository = submissionRepository; this.translationRepository = translationRepository;
         this.userRepository = userRepository; this.geminiService = geminiService;
+        this.studyStreakService = studyStreakService;
     }
 
     @Transactional
@@ -87,6 +90,7 @@ public class ProblemGenerationService {
         submission.setSourceCode(request.getSourceCode()); submission.setTestsJson(write(review.tests())); submission.setHint(review.hint());
         submission.setImprovement(review.improvement()); submission.setPassedCount(passedCount); submission.setTotalCount(3); submission.setPassed(passedCount == 3);
         submissionRepository.save(submission);
+        studyStreakService.recordSubmission(user.getId(), submission.isPassed());
         Map<String, Object> result = new LinkedHashMap<>(); result.put("status", submission.isPassed() ? "passed" : "failed");
         result.put("hint", review.hint()); result.put("improvement", review.improvement()); result.put("tests", review.tests());
         result.put("attempt", submissionMap(submission)); return result;
