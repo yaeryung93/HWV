@@ -163,13 +163,16 @@
 
 /* About */
 .intro-about {
+  display: flex;
+  min-height: 100svh;
+  align-items: center;
   background: var(--intro-surface);
   border-block: 1px solid var(--intro-border);
 }
 
 .intro-about__layout {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(520px, 1.1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(56px, 8vw, 120px);
   align-items: center;
 }
@@ -217,6 +220,12 @@
 }
 
 /* Flow */
+.intro-flow {
+  display: flex;
+  min-height: 100svh;
+  align-items: center;
+}
+
 .intro-flow__timeline {
   position: relative;
   display: grid;
@@ -366,9 +375,12 @@
 
 /* Server CTA */
 .intro-server {
+  display: flex;
+  min-height: 100svh;
+  align-items: center;
   padding-top: clamp(80px, 9vw, 130px);
   padding-bottom: clamp(80px, 9vw, 130px);
-  background: var(--intro-primary);
+  background: var(--intro-bg);
 }
 
 .intro-server__panel {
@@ -377,8 +389,8 @@
   align-items: center;
   padding: clamp(48px, 7vw, 86px) clamp(24px, 7vw, 90px);
   text-align: center;
-  background: var(--intro-surface);
-  border-radius: 24px;
+  background: transparent;
+  border-radius: 0;
 }
 
 .intro-server__logo {
@@ -391,8 +403,10 @@
 }
 
 .intro-server__panel h2 {
-  max-width: 800px;
+  max-width: none;
   margin-bottom: 16px;
+  font-size: clamp(32px, 3.1vw, 46px);
+  white-space: nowrap;
 }
 
 .intro-server__description {
@@ -523,6 +537,12 @@
 }
 
 @media (max-width: 980px) {
+  .intro-about,
+  .intro-flow,
+  .intro-server {
+    min-height: auto;
+  }
+
   .intro-about__layout {
     grid-template-columns: 1fr;
     gap: 54px;
@@ -569,6 +589,10 @@
   .intro-audience__panel {
     grid-template-columns: 1fr;
     gap: 38px;
+  }
+
+  .intro-server__panel h2 {
+    white-space: normal;
   }
 }
 
